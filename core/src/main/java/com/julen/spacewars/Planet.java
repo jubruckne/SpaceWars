@@ -1,53 +1,32 @@
 package com.julen.spacewars;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
+import static com.badlogic.gdx.graphics.GL20.*;
 
 public class Planet implements Disposable {
-    private static final float ISH_X = 0.525731112119133606f;
-    private static final float ISH_Z = 0.850650808352039932f;
-    private static final float ISH_N = 0f;
-
-    private static final float[] ICOSAHEDRON_VERTICES = {
-            -ISH_X, ISH_N, ISH_Z, ISH_X, ISH_N, ISH_Z, -ISH_X, ISH_N,-ISH_Z, ISH_X, ISH_N,-ISH_Z,
-            ISH_N, ISH_Z, ISH_X, ISH_N, ISH_Z,-ISH_X, ISH_N,-ISH_Z, ISH_X, ISH_N,-ISH_Z,-ISH_X,
-            ISH_Z, ISH_X, ISH_N, -ISH_Z, ISH_X, ISH_N, ISH_Z,-ISH_X, ISH_N, -ISH_Z,-ISH_X, ISH_N
-    };
-
-    private static final short[] ICOSAHEDRON_TRIANGLES = {
-            0,4,1,
-            0,9,4,
-            9,5,4,
-            4,5,8,
-            4,8,1,
-            8,10,1,
-            8,3,10,
-            5,3,8,
-            5,2,3,
-            2,7,3,
-            7,10,3,
-            7,6,10,
-            7,11,6,
-            11,0,6,
-            0,1,6,
-            6,1,10,
-            9,0,11,
-            9,11,2,
-            9,2,5,
-            7,2,11
-    };
-
     private Environment environment;
     private final Material material;
-    private float[] data;
+
+    private short stride;
+    private float[] vertices;
+    private short vert_pos;
+    private short verts;
+    private short[] triangles;
+    private short tri_pos;
+    private short tris;
+
+    private final Vector3 vec1 = new Vector3(0, 0, 0);
+    private final Vector3 vec2 = new Vector3(0, 0, 0);
+
     private Mesh mesh;
     ShaderProgram shader;
 
@@ -57,7 +36,23 @@ public class Planet implements Disposable {
         this.material = new Material(ColorAttribute.createDiffuse(1, 1, 1, 1));
 
         create_shader();
-        create_sphere(1);
+        create_sphere(20);
+        // freq     verts   tris
+        // 1           42     20
+        // 2           42     80
+        // 3           92    180
+        // 4          162    320
+        // 5          252    500
+        // 6          362    720
+        // 7          492    980
+        // 8          642   1280
+        // 9          812   1620
+        //10         1002   2000
+        //11         1212   2420
+        //12         1442   2880
+        //15         2252   4500
+        //18         3242   6480
+        //20         4002   8000
     }
 
     public void create_shader() {
@@ -73,13 +68,55 @@ public class Planet implements Disposable {
     }
 
     private void create_sphere(int frequency) {
-        assert frequency >= 1;
+        final float ISH_X = 0.525731112119133606f;
+        final float ISH_Z = 0.850650808352039932f;
+        final float ISH_N = 0f;
+
+        final float[] ICOSAHEDRON_VERTICES = {
+                -ISH_X, ISH_N, ISH_Z, ISH_X, ISH_N, ISH_Z, -ISH_X, ISH_N, -ISH_Z, ISH_X, ISH_N, -ISH_Z,
+                ISH_N, ISH_Z, ISH_X, ISH_N, ISH_Z, -ISH_X, ISH_N, -ISH_Z, ISH_X, ISH_N, -ISH_Z, -ISH_X,
+                ISH_Z, ISH_X, ISH_N, -ISH_Z, ISH_X, ISH_N, ISH_Z, -ISH_X, ISH_N, -ISH_Z, -ISH_X, ISH_N
+        };
+
+        final short[] ICOSAHEDRON_TRIANGLES = {
+                0, 4, 1,
+                0, 9, 4,
+                9, 5, 4,
+                4, 5, 8,
+                4, 8, 1,
+                8, 10, 1,
+                8, 3, 10,
+                5, 3, 8,
+                5, 2, 3,
+                2, 7, 3,
+                7, 10, 3,
+                7, 6, 10,
+                7, 11, 6,
+                11, 0, 6,
+                0, 1, 6,
+                6, 1, 10,
+                9, 0, 11,
+                9, 11, 2,
+                9, 2, 5,
+                7, 2, 11
+        };
+
+        vertices = new float[Short.MAX_VALUE];
+        verts = 0;
+        triangles = new short[Short.MAX_VALUE];
+        tris = 0;
+        stride = 7; // 3 pos, 4 color
+
+        Color color = new Color();
 
         // First create vertices for the base icosahedron
-        final short baseVertexIndex = vertex(ICOSAHEDRON_VERTICES[0], ICOSAHEDRON_VERTICES[1], ICOSAHEDRON_VERTICES[2]);
+        final short baseVertexIndex = vertex(ICOSAHEDRON_VERTICES[0], ICOSAHEDRON_VERTICES[1], ICOSAHEDRON_VERTICES[2], color);
         for (int i = 3; i < ICOSAHEDRON_VERTICES.length; i += 3) {
-            // No need to project, already good
-            vertex(ICOSAHEDRON_VERTICES[i], ICOSAHEDRON_VERTICES[i+1], ICOSAHEDRON_VERTICES[i+2]);
+            if (i == 3)
+                color.set((float) Math.random(), 1, 1, 1);
+            else
+                color.set((float) Math.random(), 0.2f, 0.2f, 1);
+            vertex(ICOSAHEDRON_VERTICES[i], ICOSAHEDRON_VERTICES[i + 1], ICOSAHEDRON_VERTICES[i + 2], color);
         }
 
         // There are 12 vertices which form 12*11/2 edges, disregarding edges to self
@@ -87,7 +124,7 @@ public class Planet implements Disposable {
         // to create a simple "perfect hash" lookup table.
         // The edge indices are easy to lookup directly, so they are not present here.
         // This array only contains the first index for the subdivided vertices, remaining inner ones are always sequential.
-        final short[] edgeVertices = new short[12*11/2];
+        final short[] edgeVertices = new short[12 * 11 / 2];
 
         // We iterate through every triangle, lazily creating edge subdivisions and tessellating the interior.
         for (int triangle = 0; triangle < ICOSAHEDRON_TRIANGLES.length; triangle += 3) {
@@ -96,14 +133,22 @@ public class Planet implements Disposable {
             final short i2 = ICOSAHEDRON_TRIANGLES[triangle + 2];
 
             icosphere_tessellate(
-                    (short)(baseVertexIndex + i0),
-                    (short)(baseVertexIndex + i1),
-                    (short)(baseVertexIndex + i2),
+                    (short) (baseVertexIndex + i0),
+                    (short) (baseVertexIndex + i1),
+                    (short) (baseVertexIndex + i2),
                     baseVertexIndex, frequency, edgeVertices);
         }
+
+        mesh = new Mesh(false, vert_pos, tri_pos,
+                new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+                new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, "a_color"));
+        mesh.setVertices(vertices, 0, vert_pos);
+        mesh.setIndices(triangles, 0, tri_pos);
+
+        Utils.log("Vertices = %i, Triangles = %i", (int) verts, (int) tris);
     }
 
-    private static long icosphere_base_edge(int frequency, short[] edgeVertices, short baseOffset, short from, short to) {
+    private long icosphere_base_edge(int frequency, short[] edgeVertices, short baseOffset, short from, short to) {
         final short fromI = (short) Math.min(from, to);
         final short toI = (short) Math.max(from, to);
         assert fromI != toI;
@@ -114,10 +159,10 @@ public class Planet implements Disposable {
             // Not generated yet! (while index 0 is valid, it would have already been used)
             final float step = 1f / frequency;
             float t = step;
-            edgeVertex = normalizedLerpVertex(fromI, toI, t);
+            edgeVertex = vertex_lerp(fromI, toI, t);
             for (int i = 2; i < frequency; i++) {
                 t += step;
-                normalizedLerpVertex(fromI, toI, t);
+                vertex_lerp(fromI, toI, t);
             }
 
             edgeVertices[index] = edgeVertex;
@@ -138,16 +183,16 @@ public class Planet implements Disposable {
         return packedEdge;
     }
 
-    private static long icosphere_edge(int frequency, short from, short to) {
+    private long icosphere_edge(int frequency, short from, short to) {
         // Generate inner edges, if any
         short edgeVertex = 0;
         if (frequency > 1) {
-            final float step = 1f / frequency;
+            final float step = 1f / (float) frequency;
             float t = step;
-            edgeVertex = normalizedLerpVertex(from, to, t);
+            edgeVertex = vertex_lerp(from, to, t);
             for (int i = 2; i < frequency; i++) {
                 t += step;
-                normalizedLerpVertex(from, to, t);
+                vertex_lerp(from, to, t);
             }
         }
 
@@ -156,7 +201,7 @@ public class Planet implements Disposable {
         return ((from & 0xFFFFL) << 48) | ((to & 0xFFFFL) << 32) | ((edgeVertex & 0xFFFFL) << 16) | (frequency & 0xFFFF);
     }
 
-    private static short icosphere_edge_index(long packedEdge, int index) {
+    private short icosphere_edge_index(long packedEdge, int index) {
         int frequency = (short) (packedEdge & 0xFFFF);
         int multiplier = 1;
         if (frequency < 0) {
@@ -177,11 +222,11 @@ public class Planet implements Disposable {
         return (short) (firstInner + (index - 1) * multiplier);
     }
 
-    private static void icosphere_tessellate(
-                                             short i0, short i1, short i2,
-                                             short baseOffset,
-                                             int frequency,
-                                             short[] edgeVertices) {
+    private void icosphere_tessellate(
+            short i0, short i1, short i2,
+            short baseOffset,
+            int frequency,
+            short[] edgeVertices) {
         // The tessellation is concerned with three line segments
         // left (going from bottom left to top)
         // right (going from bottom right to top)
@@ -226,24 +271,86 @@ public class Planet implements Disposable {
         }
     }
 
-    private short vertex(float x, float y, float z) {
+    private short triangle(short v1, short v2, short v3) {
+        triangles[tri_pos++] = v1;
+        triangles[tri_pos++] = v2;
+        triangles[tri_pos++] = v3;
+        return tris++;
+    }
 
+    private short vertex(float x, float y, float z, Color color) {
+        vertices[vert_pos++] = x;
+        vertices[vert_pos++] = y;
+        vertices[vert_pos++] = z;
+        vertices[vert_pos++] = color.r;
+        vertices[vert_pos++] = color.g;
+        vertices[vert_pos++] = color.b;
+        vertices[vert_pos++] = 1f;
+        return verts++;
+    }
+
+    private short vertex_lerp(short v1, short v2, float t) {
+    /*
+        takes the positions of vertices with indices a and b, computes their linear interpolation with
+        time t, normalizes the result (to be on the sphere)
+    */
+        v1 *= stride;
+        v2 *= stride;
+
+        vec1.set(
+                vertices[v1],
+                vertices[v1 + 1],
+                vertices[v1 + 2]
+        );
+
+        vec2.set(
+                vertices[v2],
+                vertices[v2 + 1],
+                vertices[v2 + 2]
+        );
+
+        /*
+        if (t != 1) {
+            Utils.log("lerp: %f", t);
+            Utils.log("vec1 %f", vec1);
+            Utils.log("vec2 %f", vec2);
+        }
+        */
+
+        vec1.lerp(vec2, t).nor();
+
+        vertices[vert_pos++] = vec1.x;
+        vertices[vert_pos++] = vec1.y;
+        vertices[vert_pos++] = vec1.z;
+        vertices[vert_pos++] = vertices[v2 + 3]; //MathUtils.lerp(vertices[v1 + 3], vertices[v2 + 3], t);
+        vertices[vert_pos++] = vertices[v2 + 4]; //MathUtils.lerp(vertices[v1 + 4], vertices[v2 + 4], t);
+        vertices[vert_pos++] = vertices[v2 + 5]; // MathUtils.lerp(vertices[v1 + 5], vertices[v2 + 5], t);
+        vertices[vert_pos++] = 1f;
+
+        return verts++;
     }
 
     public void render(Environment environment, Camera camera) {
-        Gdx.gl20.glDisable(GL20.GL_CULL_FACE);
-
         shader.bind();
         shader.setUniformMatrix("u_projTrans", camera.combined);
-        mesh.render(shader, GL20.GL_POINTS);
+
+        Gdx.gl20.glEnable(GL_CULL_FACE);
+        // Gdx.gl20.glCullFace(GL_BACK);
+
+
+        shader.setUniformf("u_bw", 0.0f);
+        mesh.render(shader, GL20.GL_TRIANGLES);
+
+        //shader.setUniformf("u_bw", 1.0f);
+        //mesh.render(shader, GL20.GL_POINTS);
     }
 
     @Override
     public void dispose() {
-        if(this.mesh != null)
+        if (this.mesh != null)
             this.mesh.dispose();
 
-        if(this.shader != null)
+        if (this.shader != null)
             this.shader.dispose();
     }
 }
