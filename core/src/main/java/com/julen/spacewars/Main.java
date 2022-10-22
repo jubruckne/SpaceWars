@@ -36,6 +36,8 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 
 	private BitmapFont font;
 
+	Planet planet;
+
 	@Override
 	public void create() {
 		Gdx.input.setInputProcessor(this);
@@ -57,8 +59,9 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 		*/
 
 		camera = new PerspectiveCamera(45, 800, 600);
-		camera.position.set(map.width / 2.25f, -map.height / 1.2f, map.width * 1.5f);
-		camera.rotate(map.right, 45);
+		camera.position.set(0, 0, 5);
+		camera.lookAt(0,0,0);
+		//camera.rotate(map.right, 45);
 		camera.near = 0.85f;
 		camera.far = 1000f;
 		camera.update();
@@ -77,6 +80,8 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 		light.setDirection(new Vector3(0.15f, 0.15f, -0.5f).nor());
 		environment.add(light);
 
+		planet = new Planet(5);
+
 		modelBatch = new ModelBatch();
 	}
 
@@ -87,12 +92,13 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 		//camController.update();
 		camera.update();
 
+		Gdx.gl.glClearColor(0.5f, 0.3f, 0.8f, 1f);
 		Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
+/*
 		modelBatch.begin(camera);
 		map.render(modelBatch, environment);
 		modelBatch.end();
-
+*/
 		batch_ui.begin();
 		font.getData().setScale(0.8f);
 		font.draw(batch_ui, Utils.format("Screen: %.0f", get_mouse_pos_screen()), 10, 590);
@@ -108,6 +114,8 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 						fps_counter.getHighest(),
 						fps_counter.getMean()), 10, 545);
 		batch_ui.end();
+
+		planet.render(environment, camera);
 	}
 
 	private void update() {
@@ -134,23 +142,25 @@ public class Main extends ApplicationAdapter implements InputProcessor {
 			camera.position.sub(map.up.cpy().scl(scroll_speed));
 		}
 
+		Vector3 center = new Vector3(0,0,0);
+
 		if(Gdx.input.isKeyPressed(Input.Keys.Q))
-			camera.rotateAround(map.center, map.up, 1);
+			camera.rotateAround(center, map.up, 1);
 
 		if(Gdx.input.isKeyPressed(Input.Keys.W))
-			camera.rotateAround(map.center, map.up, -1);
+			camera.rotateAround(center, map.up, -1);
 
 		if(Gdx.input.isKeyPressed(Input.Keys.E))
-			camera.rotateAround(map.center, map.right, 1);
+			camera.rotateAround(center, map.right, 1);
 
 		if(Gdx.input.isKeyPressed(Input.Keys.R))
-			camera.rotateAround(map.center, map.right, -1);
+			camera.rotateAround(center, map.right, -1);
 
 		if(Gdx.input.isKeyPressed(Input.Keys.T))
-			camera.rotateAround(map.center, new Vector3(0, 0, 1), 1);
+			camera.rotateAround(center, new Vector3(0, 0, 1), 1);
 
 		if(Gdx.input.isKeyPressed(Input.Keys.Y))
-			camera.rotateAround(map.center, new Vector3(0, 0, 1), -1);
+			camera.rotateAround(center, new Vector3(0, 0, 1), -1);
 
 		if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
 			if(camera.position.z < 1000f)

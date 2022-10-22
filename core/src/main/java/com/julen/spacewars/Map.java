@@ -5,12 +5,9 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ArrayMap;
 
@@ -129,9 +126,9 @@ public class Map {
         Texture texture = new Texture("7wfqeqx.png");
 
         model = modelBuilder.createSphere(
-                3.5f,
-                3.5f,
-                3.5f,
+                0.5f,
+                0.5f,
+                0.5f,
                 32,
                 32,
                 new Material(ColorAttribute.createDiffuse(Color.RED)),
@@ -139,8 +136,9 @@ public class Map {
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
         models.put("center", model);
         instances.put("center", new ModelInstance(model));
-        instances.get("center").transform.setTranslation(center);
+        //instances.get("center").transform.setTranslation(center);
 
+        /*
         modelBuilder.begin();
         Vector3 r1 = new Vector3(); // top left
         Vector3 r2 = new Vector3(); // top right
@@ -247,6 +245,7 @@ public class Map {
 
         models.put("map", model);
         instances.put("map", new ModelInstance(model));
+        */
     }
 
     public void select(int x, int y) {
@@ -399,7 +398,6 @@ public class Map {
             modelBatch.render(i, environment);
         }
 
-        Gdx.gl.glDisable(Gdx.gl20.GL_BLEND);
-
+       // Gdx.gl.glDisable(Gdx.gl20.GL_BLEND);
     }
 }
