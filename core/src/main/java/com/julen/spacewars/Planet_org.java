@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
 
-public class Planet implements Disposable {
+public class Planet_org implements Disposable {
     private static final float ISH_X = 0.525731112119133606f;
     private static final float ISH_Z = 0.850650808352039932f;
     private static final float ISH_N = 0f;
@@ -27,7 +27,7 @@ public class Planet implements Disposable {
     ShaderProgram shader;
     private Texture texture;
 
-    public Planet(float radius) {
+    public Planet_org(float radius) {
         super();
 
         this.material = new Material(ColorAttribute.createDiffuse(1, 1, 1, 1));
