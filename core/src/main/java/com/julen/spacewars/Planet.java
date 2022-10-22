@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
@@ -31,36 +30,15 @@ public class Planet implements Disposable {
     }
 
     public void update() {
-        String VERT_SHADER =
-                "attribute vec2 a_position;\n" +
-                        "attribute vec4 a_color;\n" +
-                        "uniform mat4 u_projTrans;\n" +
-                        "varying vec4 vColor;\n" +
-                        "void main() {\n" +
-                        "	vColor = a_color;\n" +
-                        "	gl_Position =  u_projTrans * vec4(a_position.xy, 0.0, 1.0);\n" +
-    //                    "   gl_Position.x = gl_Position.x + u_rnd;\n" +
-                        "}";
-
-        String FRAG_SHADER =
-                "#ifdef GL_ES\n" +
-                        "precision mediump float;\n" +
-                        "#endif\n" +
-                        "varying vec4 vColor;\n" +
-                        "void main() {\n" +
-                        "	gl_FragColor = vColor;\n" +
-                        "}";
-
-
         ShaderProgram.pedantic = false;
-        shader = new ShaderProgram(VERT_SHADER, FRAG_SHADER);
-        String log = shader.getLog();
+        shader = new ShaderProgram(
+                Gdx.files.internal("shaders/default.vert"),
+                Gdx.files.internal("shaders/default.frag"));
 
-        if (!shader.isCompiled())
+        if (!shader.isCompiled()) {
             Utils.log("shader not compiled!");
-
-        if (log!=null && log.length()!=0)
-               Utils.log("Shader Log: " + log);
+            Utils.log("Shader Log: %s", shader.getLog());
+        }
 
         create_sphere();
     }
@@ -165,19 +143,10 @@ public class Planet implements Disposable {
         verts[v++] = color.b;
         verts[v++] = color.a;
 
-        MeshBuilder builder = new MeshBuilder();
-        builder.nor
-
         mesh = new Mesh(true, 12, 0,
                 new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
                 new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, "a_color"));
         mesh.setVertices(verts);
-
-        v1 = &tmpVertices[tmpIndices[j] * 3];
-        v2 = &tmpVertices[tmpIndices[j + 1] * 3];
-        v3 = &tmpVertices[tmpIndices[j + 2] * 3];
-
-        mesh.setIndices(
     }
 
     public void render(Environment environment, Camera camera) {
