@@ -73,11 +73,11 @@ public class Main extends ApplicationAdapter implements InputProcessor {
         batch_ui.setProjectionMatrix(camera_ui.combined);
 
         environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.25f, 0.25f, 0.25f, 1f));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.025f, 0.025f, 0.025f, 1f));
 
         DirectionalLight light = new DirectionalLight();
         light.setColor(1f, 1f, 1f, 1f);
-        light.setDirection(new Vector3(0.15f, 0.15f, -0.5f).nor());
+        light.setDirection(new Vector3(1.5f, 0.15f, 0.0f).nor());
         environment.add(light);
 
         planet = new Planet(5);
