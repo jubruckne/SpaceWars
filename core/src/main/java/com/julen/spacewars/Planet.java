@@ -9,13 +9,8 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.Timer;
 
-import java.sql.Time;
-import java.util.TimeZone;
-
-import static com.badlogic.gdx.graphics.GL20.*;
+import static com.badlogic.gdx.graphics.GL20.GL_LINES;
 
 public class Planet implements Disposable {
     private Environment environment;
@@ -58,7 +53,7 @@ public class Planet implements Disposable {
         wireframes = new Mesh[20];
 
         for (int i = 0; i < 20; i++) {
-            create_sphere_section(i, 25);
+            create_sphere_section(i, 7);
         }
     }
 
@@ -66,7 +61,7 @@ public class Planet implements Disposable {
         ShaderProgram.pedantic = true;
         shader = new ShaderProgram(
                 Gdx.files.internal("shaders/default.vert"),
-                Gdx.files.internal("shaders/clouds.glsl"));
+                Gdx.files.internal("shaders/default.frag"));
 
         if (!shader.isCompiled()) {
             Utils.log("shader not compiled!");

@@ -1,6 +1,9 @@
 varying vec4 vColor;
 varying vec3 vNormal;
 
+uniform float u_bw;
+
+
 void main() {
     //this is hardcoded you want to pass it from your environment
     float ambient_strength = 0.1;
@@ -22,5 +25,9 @@ void main() {
     vec3 light = (ambient_light + diffuse_light) * vColor.xyz;
 
     // feed into our frag colour
-    gl_FragColor = vec4(light, 1.0);
+    if (u_bw == 0.0) {
+        gl_FragColor = vec4(light, 1.0);
+    } else {
+        gl_FragColor = vColor;
+    }
 }

@@ -20,9 +20,9 @@ void main() {
         vColor = a_color;
     } else {
         vColor = vec4(
-            min(1.0, a_color.r + 0.5),
-            min(1.0, a_color.g + 0.5),
-            min(1.0, a_color.b + 0.5),
+            min(1.0, a_color.r + 0.15),
+            min(1.0, a_color.g + 0.15),
+            min(1.0, a_color.b + 0.15),
             1.0
         );
     }
