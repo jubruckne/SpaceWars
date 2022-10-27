@@ -5,10 +5,15 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.Timer;
+
+import java.sql.Time;
+import java.util.TimeZone;
 
 import static com.badlogic.gdx.graphics.GL20.*;
 
@@ -23,17 +28,26 @@ public class Planet implements Disposable {
     private short[] triangles;
     private short tri_pos;
     private short tris;
+    private short[] lines;
+    private short lin_pos;
+    private short lins;
 
     private final Vector3 vec1 = new Vector3(0, 0, 0);
     private final Vector3 vec2 = new Vector3(0, 0, 0);
 
     private Mesh[] meshes;
+    private Mesh[] wireframes;
+
+    public Matrix4 transform;
+
     ShaderProgram shader;
 
     public Planet(float radius) {
         super();
 
         this.material = new Material(ColorAttribute.createDiffuse(1, 1, 1, 1));
+        this.transform = new Matrix4();
+        this.transform.idt();
 
         create_shader();
         create_sphere();
@@ -41,34 +55,18 @@ public class Planet implements Disposable {
 
     private void create_sphere() {
         meshes = new Mesh[20];
+        wireframes = new Mesh[20];
 
         for (int i = 0; i < 20; i++) {
-            meshes[i] = create_sphere_section(i, 55);
+            create_sphere_section(i, 25);
         }
-
-        // freq     verts   tris
-        // 1           42     20
-        // 2           42     80
-        // 3           92    180
-        // 4          162    320
-        // 5          252    500
-        // 6          362    720
-        // 7          492    980
-        // 8          642   1280
-        // 9          812   1620
-        //10         1002   2000
-        //11         1212   2420
-        //12         1442   2880
-        //15         2252   4500
-        //18         3242   6480
-        //20         4002   8000
     }
 
     public void create_shader() {
         ShaderProgram.pedantic = true;
         shader = new ShaderProgram(
                 Gdx.files.internal("shaders/default.vert"),
-                Gdx.files.internal("shaders/default.frag"));
+                Gdx.files.internal("shaders/clouds.glsl"));
 
         if (!shader.isCompiled()) {
             Utils.log("shader not compiled!");
@@ -76,7 +74,7 @@ public class Planet implements Disposable {
         }
     }
 
-    private Mesh create_sphere_section(int section, int frequency) {
+    private void create_sphere_section(int section, int frequency) {
         final float ISH_X = 0.525731112119133606f;
         final float ISH_Z = 0.850650808352039932f;
         final float ISH_N = 0f;
@@ -118,8 +116,33 @@ public class Planet implements Disposable {
         tri_pos = 0;
         stride = 10; // 3 pos,3 norm, 4 color
 
-        Color color = new Color((float) Math.random() + 0.2f, (float) Math.random(), (float) Math.random(), 1f);
+        lins = 0;
+        lin_pos = 0;
+        lines = new short[Short.MAX_VALUE];
 
+        Color color = new Color();
+
+        if (section % 3 == 0)
+            color.set(
+                    (float) Math.random() * 0.3f + 0.7f,
+                    (float) Math.random() * 0.8f + 0.2f,
+                    (float) Math.random() * 0.8f + 0.2f,
+                    1f
+            );
+        else if (section % 3 == 1)
+            color.set(
+                    (float) Math.random() * 0.8f + 0.2f,
+                    (float) Math.random() * 0.3f + 0.7f,
+                    (float) Math.random() * 0.8f + 0.2f,
+                    1f
+            );
+        else
+            color.set(
+                    (float) Math.random() * 0.8f + 0.2f,
+                    (float) Math.random() * 0.8f + 0.2f,
+                    (float) Math.random() * 0.3f + 0.7f,
+                    1f
+            );
         // First create vertices for the base icosahedron
         final short baseVertexIndex = vertex(ICOSAHEDRON_VERTICES[0], ICOSAHEDRON_VERTICES[1], ICOSAHEDRON_VERTICES[2], color);
         for (int i = 3; i < ICOSAHEDRON_VERTICES.length; i += 3) {
@@ -153,11 +176,17 @@ public class Planet implements Disposable {
                 new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
         mesh.setVertices(vertices, 0, vert_pos);
         mesh.setIndices(triangles, 0, tri_pos);
+        meshes[section] = mesh;
 
+        mesh = new Mesh(true, vert_pos, lin_pos,
+                new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
+                new VertexAttribute(VertexAttributes.Usage.Normal, 3, ShaderProgram.NORMAL_ATTRIBUTE),
+                new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        mesh.setVertices(vertices, 0, vert_pos);
+        mesh.setIndices(lines, 0, lin_pos);
+        wireframes[section] = mesh;
 
         Utils.log("Section %i: Vertices = %i, Triangles = %i", section, (int) verts, (int) tris);
-
-        return mesh;
     }
 
     private long icosphere_base_edge(int frequency, short[] edgeVertices, short baseOffset, short from, short to) {
@@ -283,51 +312,30 @@ public class Planet implements Disposable {
         }
     }
 
-    private short triangle(short v1, short v2, short v3) {
+    private void triangle(short v1, short v2, short v3) {
         triangles[tri_pos++] = v1;
         triangles[tri_pos++] = v2;
         triangles[tri_pos++] = v3;
+        tris++;
 
-        Vector3 vec1 = new Vector3(
-                vertices[v1],
-                vertices[v1 + 1],
-                vertices[v1 + 2]
-        );
-        Vector3 vec2 = new Vector3(
-                vertices[v2],
-                vertices[v2 + 1],
-                vertices[v2 + 2]
-        );
-        Vector3 vec3 = new Vector3(
-                vertices[v3],
-                vertices[v3 + 1],
-                vertices[v3 + 2]
-        );
+        lines[lin_pos++] = v1;
+        lines[lin_pos++] = v2;
 
-        Vector3 n = vec2.cpy().sub(vec3).crs(vec1.cpy().sub(vec3)).nor();
+        lines[lin_pos++] = v2;
+        lines[lin_pos++] = v3;
 
-        vertices[v1 * stride + 3] = n.x;
-        vertices[v1 * stride + 4] = n.y;
-        vertices[v1 * stride + 5] = n.z;
-
-        vertices[v2 * stride + 3] = n.x;
-        vertices[v2 * stride + 4] = n.y;
-        vertices[v2 * stride + 5] = n.z;
-
-        vertices[v3 * stride + 3] = n.x;
-        vertices[v3 * stride + 4] = n.y;
-        vertices[v3 * stride + 5] = n.z;
-
-        return tris++;
+        lines[lin_pos++] = v3;
+        lines[lin_pos++] = v1;
+        lins++;
     }
 
     private short vertex(float x, float y, float z, Color color) {
         vertices[vert_pos++] = x;
         vertices[vert_pos++] = y;
         vertices[vert_pos++] = z;
-        vertices[vert_pos++] = 0;
-        vertices[vert_pos++] = 0;
-        vertices[vert_pos++] = 0;
+        vertices[vert_pos++] = x;
+        vertices[vert_pos++] = y;
+        vertices[vert_pos++] = z;
         vertices[vert_pos++] = color.r;
         vertices[vert_pos++] = color.g;
         vertices[vert_pos++] = color.b;
@@ -368,9 +376,12 @@ public class Planet implements Disposable {
         vertices[vert_pos++] = vec1.x;
         vertices[vert_pos++] = vec1.y;
         vertices[vert_pos++] = vec1.z;
-        vertices[vert_pos++] = 0;
-        vertices[vert_pos++] = 0;
-        vertices[vert_pos++] = 0;
+
+        vec1.nor();
+        vertices[vert_pos++] = vec1.x;
+        vertices[vert_pos++] = vec1.y;
+        vertices[vert_pos++] = vec1.z;
+
         vertices[vert_pos++] = vertices[v2 + 6]; //MathUtils.lerp(vertices[v1 + 3], vertices[v2 + 3], t);
         vertices[vert_pos++] = vertices[v2 + 7]; //MathUtils.lerp(vertices[v1 + 4], vertices[v2 + 4], t);
         vertices[vert_pos++] = vertices[v2 + 8]; // MathUtils.lerp(vertices[v1 + 5], vertices[v2 + 5], t);
@@ -382,9 +393,8 @@ public class Planet implements Disposable {
     public void render(Environment environment, Camera camera) {
         shader.bind();
         shader.setUniformMatrix("u_projTrans", camera.combined);
-
-        Gdx.gl20.glEnable(GL_CULL_FACE);
-        // Gdx.gl20.glCullFace(GL_BACK);
+        shader.setUniformMatrix("u_modelTrans", transform);
+        shader.setUniformf("u_time", Gdx.graphics.getFrameId() / 100f);
 
 
         shader.setUniformf("u_bw", 0.0f);
@@ -392,8 +402,10 @@ public class Planet implements Disposable {
             m.render(shader, GL20.GL_TRIANGLES);
         }
 
-        //shader.setUniformf("u_bw", 1.0f);
-        //mesh.render(shader, GL20.GL_POINTS);
+        shader.setUniformf("u_bw", 1.0f);
+        for (Mesh m : this.wireframes) {
+            m.render(shader, GL_LINES);
+        }
     }
 
     @Override
