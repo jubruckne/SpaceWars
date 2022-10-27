@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -40,7 +40,10 @@ public class Planet implements Disposable {
     public Planet(float radius) {
         super();
 
-        this.material = new Material(ColorAttribute.createDiffuse(1, 1, 1, 1));
+        // this.material = new Material(ColorAttribute.createDiffuse(1, 1, 1, 1));
+        this.material = new Material(
+                TextureAttribute.createDiffuse(new Texture("world.png")));
+
         this.transform = new Matrix4();
         this.transform.idt();
 
@@ -53,7 +56,7 @@ public class Planet implements Disposable {
         wireframes = new Mesh[20];
 
         for (int i = 0; i < 20; i++) {
-            create_sphere_section(i, 7);
+            create_sphere_section(i, 5);
         }
     }
 
@@ -151,8 +154,6 @@ public class Planet implements Disposable {
         // This array only contains the first index for the subdivided vertices, remaining inner ones are always sequential.
         final short[] edgeVertices = new short[12 * 11 / 2];
 
-        // We iterate through every triangle, lazily creating edge subdivisions and tessellating the interior.
-        //for (int triangle = 0; triangle < ICOSAHEDRON_TRIANGLES.length; triangle += 3) {
         int triangle = section * 3;
         final short i0 = ICOSAHEDRON_TRIANGLES[triangle];
         final short i1 = ICOSAHEDRON_TRIANGLES[triangle + 1];
@@ -163,7 +164,6 @@ public class Planet implements Disposable {
                 (short) (baseVertexIndex + i1),
                 (short) (baseVertexIndex + i2),
                 baseVertexIndex, frequency, edgeVertices);
-        //}
 
         Mesh mesh = new Mesh(true, vert_pos, tri_pos,
                 new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
@@ -390,9 +390,14 @@ public class Planet implements Disposable {
         shader.setUniformMatrix("u_projTrans", camera.combined);
         shader.setUniformMatrix("u_modelTrans", transform);
         shader.setUniformf("u_time", Gdx.graphics.getFrameId() / 100f);
-
-
         shader.setUniformf("u_bw", 0.0f);
+
+        TextureAttribute attribute = (TextureAttribute) material.get(TextureAttribute.Diffuse);
+        attribute.textureDescription.texture.bind();
+
+        //  this.meshes[5].render(shader, GL20.GL_TRIANGLES);
+
+
         for (Mesh m : this.meshes) {
             m.render(shader, GL20.GL_TRIANGLES);
         }
@@ -401,6 +406,7 @@ public class Planet implements Disposable {
         for (Mesh m : this.wireframes) {
             m.render(shader, GL_LINES);
         }
+
     }
 
     @Override
