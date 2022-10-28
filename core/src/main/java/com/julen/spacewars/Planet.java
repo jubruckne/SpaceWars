@@ -42,7 +42,7 @@ public class Planet implements Disposable {
 
         // this.material = new Material(ColorAttribute.createDiffuse(1, 1, 1, 1));
         this.material = new Material(
-                TextureAttribute.createDiffuse(new Texture("world.png")));
+                TextureAttribute.createDiffuse(new Texture("uv-test.png")));
 
         this.transform = new Matrix4();
         this.transform.idt();
@@ -56,7 +56,7 @@ public class Planet implements Disposable {
         wireframes = new Mesh[20];
 
         for (int i = 0; i < 20; i++) {
-            create_sphere_section(i, 5);
+            create_sphere_section(i, 55);
         }
     }
 
@@ -389,14 +389,11 @@ public class Planet implements Disposable {
         shader.bind();
         shader.setUniformMatrix("u_projTrans", camera.combined);
         shader.setUniformMatrix("u_modelTrans", transform);
-        shader.setUniformf("u_time", Gdx.graphics.getFrameId() / 100f);
+        // shader.setUniformf("u_time", Gdx.graphics.getFrameId() / 100f);
         shader.setUniformf("u_bw", 0.0f);
 
         TextureAttribute attribute = (TextureAttribute) material.get(TextureAttribute.Diffuse);
         attribute.textureDescription.texture.bind();
-
-        //  this.meshes[5].render(shader, GL20.GL_TRIANGLES);
-
 
         for (Mesh m : this.meshes) {
             m.render(shader, GL20.GL_TRIANGLES);
