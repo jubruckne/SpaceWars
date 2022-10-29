@@ -5,9 +5,9 @@ test { exclude '**' }
 
 // Copy all xcframeworks to xcode/native/ios
 // They need to be picked up from there for linking in XCode
-task copyNatives  {
+task copyNatives {
     doLast {
-        file("xcode/native/ios/").mkdirs();
+        file("xcode/native/ios/").mkdirs()
         def subDir = "META-INF/robovm/ios/libs/"
         configurations.natives.files.each { jar ->
             copy {
@@ -22,7 +22,7 @@ task copyNatives  {
         }
 
         def LD_FLAGS = "LIBGDX_NATIVES = -Wl,-all_load"
-        def outFlags = file("xcode/ios-moe/custom.xcconfig");
+        def outFlags = file("xcode/ios-moe/custom.xcconfig")
         outFlags.write LD_FLAGS
 
         def proguard = file("proguard.append.cfg")
@@ -37,9 +37,9 @@ task copyNatives  {
 configurations { natives }
 
 dependencies {
-	implementation "io.github.berstanio:gdx-backend-moe:$gdxVersion"
-	implementation project(':core')
-	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+    implementation "io.github.berstanio:gdx-backend-moe:$gdxVersion"
+    implementation project(':core')
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
 
 }
 

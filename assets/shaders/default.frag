@@ -27,7 +27,7 @@ void main() {
         // combine ambient and diffuse
         vec3 light = (ambient_light + diffuse_light) * vColor.xyz;
         gl_FragColor = vec4(light, 1.0);
-        gl_FragColor = texture2D(u_texture, vTexcoord.st) * vec4(ambient_light + diffuse_light, 1.0) * 3.0;
+        gl_FragColor = vec4(texture2D(u_texture, vTexcoord.st) * vec4(ambient_light + diffuse_light, 1.0) * 3.0);
 
     } else {
         vec3 light = (ambient_light + diffuse_light) * vColor.xyz;
