@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
-import static com.badlogic.gdx.graphics.GL20.GL_LINES;
+import static com.badlogic.gdx.graphics.GL20.*;
 
 public class Planet implements Disposable {
     private Environment environment;
@@ -56,7 +56,7 @@ public class Planet implements Disposable {
         wireframes = new Mesh[20];
 
         for (int i = 0; i < 20; i++) {
-            create_sphere_section(i, 5);
+            create_sphere_section(i, 7);
         }
     }
 
@@ -392,8 +392,12 @@ public class Planet implements Disposable {
         shader.setUniformf("u_time", Gdx.graphics.getFrameId() / 100f);
         shader.setUniformf("u_bw", 0.0f);
 
+
         TextureAttribute attribute = (TextureAttribute) material.get(TextureAttribute.Diffuse);
         attribute.textureDescription.texture.bind();
+
+        Gdx.gl20.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        Gdx.gl20.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
         //  this.meshes[5].render(shader, GL20.GL_TRIANGLES);
 

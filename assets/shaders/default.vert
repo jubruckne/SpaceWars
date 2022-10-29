@@ -68,12 +68,25 @@ void main() {
     iTime = u_time;
     gl_Position = u_projTrans * u_modelTrans * vec4(a_position, 1);
 
-    vNormal = normalize(u_projTrans * u_modelTrans * vec4(a_position, 1)).xyz;
+    vNormal = normalize(vec4(a_position, 1)).xyz;
     vPosition = u_projTrans * vec4(a_position, 1.0);
     vTexcoord = vec2(
-        (atan2_(a_normal.z, a_normal.x) / PI2) * 0.25,
-        (sin(a_normal.y) / PI + 0.5)
+        (atan2_(vNormal.x, vNormal.z) / -PI2) * 0.5,
+        (asin(vNormal.y) / PI + 0.5)
     );
+
+    if (vTexcoord.x < 0.0) {
+        vTexcoord.x += 1.0;
+    }
+
+
+    if (vTexcoord.y < 0.0) {
+        vTexcoord.y += 1.0;
+    }
+
+    vNormal = normalize(u_projTrans * u_modelTrans * vec4(a_position, 1)).xyz;
+
+
 
 }
 
