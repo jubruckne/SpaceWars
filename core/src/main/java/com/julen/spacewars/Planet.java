@@ -42,7 +42,7 @@ public class Planet implements Disposable {
 
         // this.material = new Material(ColorAttribute.createDiffuse(1, 1, 1, 1));
         this.material = new Material(
-                TextureAttribute.createDiffuse(new Texture("world.png")));
+                TextureAttribute.createDiffuse(new Texture("uv-check.png")));
 
         this.transform = new Matrix4();
         this.transform.idt();
