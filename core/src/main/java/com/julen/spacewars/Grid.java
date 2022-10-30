@@ -1,8 +1,6 @@
 package com.julen.spacewars;
 
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
@@ -56,12 +54,22 @@ public class Grid implements Disposable {
 
     }
 
-    public void render() {
+    public void render(Camera camera) {
+        shader.bind();
+        shader.setUniformMatrix("u_projTrans", camera.combined);
+        shader.setUniformMatrix("u_modelTrans", transform);
 
+        mesh.render(shader, GL20.GL_TRIANGLES);
     }
 
     @Override
     public void dispose() {
+        if (this.mesh != null) {
+            mesh.dispose();
+            shader.dispose();
 
+            mesh = null;
+            shader = null;
+        }
     }
 }

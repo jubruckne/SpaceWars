@@ -109,6 +109,8 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 		map.render(modelBatch, environment);
 		modelBatch.end();
 */
+        grid.render(camera);
+
         planet.render(environment, camera);
 
         batch_ui.begin();
