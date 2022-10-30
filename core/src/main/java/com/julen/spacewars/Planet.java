@@ -63,8 +63,8 @@ public class Planet implements Disposable {
     public void create_shader() {
         ShaderProgram.pedantic = true;
         shader = new ShaderProgram(
-                Gdx.files.internal("shaders/default.vert"),
-                Gdx.files.internal("shaders/default.frag"));
+                Gdx.files.internal("shaders/default.vert.glsl"),
+                Gdx.files.internal("shaders/default.frag.glsl"));
 
         if (!shader.isCompiled()) {
             Utils.log("shader not compiled!");

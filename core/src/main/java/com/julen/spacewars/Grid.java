@@ -1,6 +1,10 @@
 package com.julen.spacewars;
 
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
@@ -10,14 +14,6 @@ public class Grid implements Disposable {
     public final float height;
     public final float depth;
     public final Matrix4 transform;
-
-    private short stride;
-    private float[] vertices;
-    private short vert_pos;
-    private short verts;
-    private short[] triangles;
-    private short tri_pos;
-    private short tris;
 
     private Mesh mesh;
     private ShaderProgram shader;
@@ -32,22 +28,33 @@ public class Grid implements Disposable {
     }
 
     private void setup() {
-        vertices = new float[1000];
-        verts = 0;
-        vert_pos = 0;
-        triangles = new short[1000];
-        tris = 0;
-        tri_pos = 0;
-        stride = 10; // 3 pos, 3 norm, 4 color
+        ShaderProgram.pedantic = true;
+        shader = new ShaderProgram(
+                Gdx.files.internal("shaders/grid.vert.glsl"),
+                Gdx.files.internal("shaders/grid.frag.glsl"));
 
-        this.mesh = new Mesh(true, vert_pos, tri_pos,
-                new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.Normal, 3, ShaderProgram.NORMAL_ATTRIBUTE),
-                new VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        mesh.setVertices(vertices, 0, vert_pos);
-        mesh.setIndices(triangles, 0, tri_pos);
+        if (!shader.isCompiled()) {
+            Utils.log("shader not compiled!");
+            Utils.log("Shader Log: %s", shader.getLog());
+        }
 
-        Utils.log("%s: Vertices = %i, Triangles = %i", this.getClass().getSimpleName(), (int) verts, (int) tris);
+        Builder builder = new Builder();
+
+        builder.cube(-2.5f, 0, 0, 5f, 0.005f, 0.005f, Color.LIGHT_GRAY);
+        builder.cube(2.5f, 0, 0, 5f, 0.01f, 0.01f, Color.RED);
+
+        builder.cube(0, -2.5f, 0, 0.005f, 5f, 0.005f, Color.LIGHT_GRAY);
+        builder.cube(0, 2.5f, 0, 0.01f, 5f, 0.01f, Color.GREEN);
+
+        builder.cube(0, 0, -2.5f, 0.005f, 0.005f, 5f, Color.LIGHT_GRAY);
+        builder.cube(0, 0, 2.5f, 0.01f, 0.01f, 5f, Color.BLUE);
+
+        /*
+        builder.cube(0.5f, 0.5f, 0.5f, 0.25f, 0.25f, 0.25f, Color.YELLOW);
+        builder.cube(0.8f, 0.8f, 0.8f, 0.25f, 0.25f, 0.25f, Color.PINK);
+        builder.cube(1.1f, 1.1f, 1.1f, 0.25f, 0.25f, 0.25f, Color.PURPLE);
+    ^   */
+        this.mesh = builder.build();
     }
 
     public void update() {

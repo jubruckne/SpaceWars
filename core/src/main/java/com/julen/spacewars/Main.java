@@ -62,7 +62,7 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 		*/
 
         camera = new PerspectiveCamera(67, 800, 600);
-        camera.position.set(0, 0, 1.9f);
+        camera.position.set(0, 0, 2.5f);
         camera.lookAt(0, 0, 0);
         //camera.rotate(map.right, 45);
         camera.near = 0.85f;
@@ -97,8 +97,9 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
         //camController.update();
         camera.update();
 
+
         Gdx.gl20.glEnable(GL_CULL_FACE);
-        Gdx.gl20.glCullFace(GL_FRONT);
+        Gdx.gl20.glCullFace(GL_BACK);
         Gdx.gl20.glEnable(GL_DEPTH_TEST);
         Gdx.gl20.glDepthFunc(GL_LESS);
 
@@ -111,7 +112,13 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 */
         grid.render(camera);
 
+        Gdx.gl20.glCullFace(GL_FRONT);
+
         planet.render(environment, camera);
+
+        //Gdx.gl20.glDisable(GL_DEPTH_TEST);
+        //Gdx.gl20.glDisable(GL_CULL_FACE);
+
 
         batch_ui.begin();
         font.getData().setScale(0.8f);
@@ -131,7 +138,8 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
     }
 
     private void update() {
-        planet.transform.rotate(new Vector3(0, 1, 0), 0.15f);
+        // planet.transform.rotate(new Vector3(0f, 1f, 0f), 0.15f);
+        //grid.transform.rotate(new Vector3(0f, 1f, 1f).nor(), 0.1f);
 
         float scroll_speed = 8f * Gdx.graphics.getDeltaTime();
         // Utils.log("scrollspeed = %f", scroll_speed);
