@@ -23,6 +23,7 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
     OrthographicCamera camera_ui;
     private SpriteBatch batch_ui;
     private Map map;
+    private Grid grid;
 
     private final WindowedMean fps_counter = new WindowedMean(60 * 5);
 
@@ -85,6 +86,8 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
         planet = new Planet(5);
 
         modelBatch = new ModelBatch();
+
+        this.grid = new Grid(10, 10, 10);
     }
 
     @Override
