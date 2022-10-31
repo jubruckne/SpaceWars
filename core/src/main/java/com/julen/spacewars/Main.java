@@ -1,6 +1,7 @@
 package com.julen.spacewars;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -10,7 +11,6 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.WindowedMean;
@@ -18,7 +18,7 @@ import com.badlogic.gdx.math.collision.Ray;
 
 import static com.badlogic.gdx.graphics.GL20.*;
 
-public class Main extends ApplicationAdapter implements GestureDetector.GestureListener, InputProcessor {
+public class Main extends ApplicationAdapter implements PlayerController.IEvents {
     PerspectiveCamera camera;
     OrthographicCamera camera_ui;
     private SpriteBatch batch_ui;
@@ -26,14 +26,9 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
     private Grid grid;
 
     private final WindowedMean fps_counter = new WindowedMean(60 * 5);
-
+    private PlayerController player;
     private ModelBatch modelBatch;
     public Environment environment;
-
-    boolean scroll_down = false;
-    boolean scroll_up = false;
-    boolean scroll_left = false;
-    boolean scroll_right = false;
 
     private BitmapFont font;
 
@@ -41,9 +36,9 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 
     @Override
     public void create() {
-        InputMultiplexer multiplexer = new InputMultiplexer(this, new GestureDetector(this));
+        //InputMultiplexer multiplexer = new InputMultiplexer(this, new GestureDetector(this));
 
-        Gdx.input.setInputProcessor(multiplexer);
+        // Gdx.input.setInputProcessor(multiplexer);
 
         font = new BitmapFont();
 /*
@@ -65,9 +60,12 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
         camera.position.set(0, 0, 2.5f);
         camera.lookAt(0, 0, 0);
         //camera.rotate(map.right, 45);
-        camera.near = 0.85f;
-        camera.far = 10f;
+        camera.near = 0.5f;
+        camera.far = 100f;
         camera.update();
+
+        player = new com.julen.spacewars.PlayerController(camera, this);
+        Gdx.input.setInputProcessor(player);
 
         camera_ui = new OrthographicCamera();
         camera_ui.setToOrtho(false, 800, 600);
@@ -134,10 +132,16 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
                         fps_counter.getLowest(),
                         fps_counter.getHighest(),
                         fps_counter.getMean()), 10, 545);
+
+        font.draw(batch_ui, Utils.format("%s", Gdx.graphics.getGLVersion().getDebugVersionString()), 10, 520);
+
+
         batch_ui.end();
     }
 
     private void update() {
+        player.update();
+     /*
         // planet.transform.rotate(new Vector3(0f, 1f, 0f), 0.15f);
         //grid.transform.rotate(new Vector3(0f, 1f, 1f).nor(), 0.1f);
 
@@ -193,6 +197,8 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
             if (camera.position.z > 5f)
                 camera.position.sub(map.into.cpy().scl(scroll_speed * 1.5f));
         }
+
+        */
     }
 
     public Vector2 get_mouse_pos_screen() {
@@ -225,114 +231,7 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
     }
 
     @Override
-    public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.ESCAPE) {
-            Gdx.app.exit();
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
-    @Override
-    public boolean scrolled(float amountX, float amountY) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(float x, float y, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean tap(float x, float y, int count, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean longPress(float x, float y) {
-        return false;
-    }
-
-    @Override
-    public boolean fling(float velocityX, float velocityY, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean pan(float x, float y, float deltaX, float deltaY) {
-        Vector3 panning = new Vector3();
-        if (deltaX > 0)
-            panning.x = -1;
-        else if (deltaX < 0)
-            panning.x = 1f;
-        else
-            panning.x = 0;
-
-        if (deltaY > 0)
-            panning.y = 1f;
-        else if (deltaY < 0)
-            panning.y = -1f;
-        else
-            panning.y = 0;
-
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            panning.scl(0.022f);
-
-            camera.position.add(panning);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean panStop(float x, float y, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean zoom(float initialDistance, float distance) {
-        return false;
-    }
-
-    @Override
-    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-        return false;
-    }
-
-    @Override
-    public void pinchStop() {
-
+    public void on_quit() {
+        Gdx.app.exit();
     }
 }

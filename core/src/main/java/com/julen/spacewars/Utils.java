@@ -24,10 +24,11 @@ public class Utils {
     public static String format(String format, Object... args) {
         String str = format;
 
-        for (Object arg: args) {
+        for (Object arg : args) {
             if (arg instanceof Float) {
                 str = str.replaceFirst("%.0f", Integer.toString(Math.round((Float) arg)));
-                str = str.replaceFirst("%.1f", Float.toString(Math.round((Float) arg)));
+                str = str.replaceFirst("%.1f", String.valueOf(Math.round((Float) arg * 10f) / 10f));
+                str = str.replaceFirst("%.2f", String.valueOf(Math.round((Float) arg * 100f) / 100f));
                 str = str.replaceFirst("%f", Float.toString((Float) arg));
             } else if (arg instanceof String) {
                 str = str.replaceFirst("%s", arg.toString());

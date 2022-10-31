@@ -65,13 +65,13 @@ public class Builder {
         y = y - height / 2f;
         z = z - depth / 2f;
 
-        // front face: 0
+        // front face
         short f1 = vertex(x, y, z + depth, color);
         short f2 = vertex(x + width, y, z + depth, color);
         short f3 = vertex(x + width, y + height, z + depth, color);
         short f4 = vertex(x, y + height, z + depth, color);
 
-        // back face: 1
+        // back face
         short b1 = vertex(x, y, z, color);
         short b2 = vertex(x + width, y, z, color);
         short b3 = vertex(x + width, y + height, z, color);
