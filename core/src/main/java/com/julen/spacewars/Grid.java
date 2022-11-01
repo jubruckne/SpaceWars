@@ -1,6 +1,5 @@
 package com.julen.spacewars;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -16,7 +15,6 @@ public class Grid implements Disposable {
     public final Matrix4 transform;
 
     private Mesh mesh;
-    private ShaderProgram shader;
 
     public Grid(float width, float height, float depth) {
         this.width = width;
@@ -28,40 +26,45 @@ public class Grid implements Disposable {
     }
 
     private void setup() {
-        ShaderProgram.pedantic = true;
-        shader = new ShaderProgram(
-                Gdx.files.internal("shaders/grid.vert.glsl"),
-                Gdx.files.internal("shaders/grid.frag.glsl"));
+        Builder builder = new Builder();
+        builder.hasNormal = false;
+        builder.hasColor = true;
 
-        if (!shader.isCompiled()) {
-            Utils.log("shader not compiled!");
-            Utils.log("Shader Log: %s", shader.getLog());
+        final float line_width = 0.001f;
+        final float line_spacing = 0.25f;
+
+        // x
+        builder.cube(-2.5f, 0f, 0f, 5f, 0.005f, 0.005f, Color.GRAY);
+        builder.cube(2.5f, 0f, 0f, 5f, 0.01f, 0.01f, Color.RED);
+
+        for (float i = line_spacing; i <= 5f; i += line_spacing) {
+            builder.cube(0f, 0f, -i, 10f, line_width * 0.5f, line_width, Color.DARK_GRAY);
+            builder.cube(-2.5f, 0f, i, 5f, line_width * 0.5f, line_width, Color.DARK_GRAY);
+            builder.cube(2.5f, 0f, i, 5f, line_width, line_width, Color.GRAY);
         }
 
-        Builder builder = new Builder();
-
-        builder.cube(-2.5f, 0, 0, 5f, 0.005f, 0.005f, Color.LIGHT_GRAY);
-        builder.cube(2.5f, 0, 0, 5f, 0.01f, 0.01f, Color.RED);
-
-        builder.cube(0, -2.5f, 0, 0.005f, 5f, 0.005f, Color.LIGHT_GRAY);
+        // y
+        builder.cube(0, -2.5f, 0, 0.005f, 5f, 0.005f, Color.GRAY);
         builder.cube(0, 2.5f, 0, 0.01f, 5f, 0.01f, Color.GREEN);
 
-        builder.cube(0, 0, -2.5f, 0.005f, 0.005f, 5f, Color.LIGHT_GRAY);
+        // z
+        builder.cube(0, 0, -2.5f, 0.005f, 0.005f, 5f, Color.GRAY);
         builder.cube(0, 0, 2.5f, 0.01f, 0.01f, 5f, Color.BLUE);
+        for (float i = line_spacing; i <= 5f; i += line_spacing) {
+            builder.cube(-i, 0f, 0f, line_width, line_width * 0.5f, 10f, Color.DARK_GRAY);
 
-        /*
-        builder.cube(0.5f, 0.5f, 0.5f, 0.25f, 0.25f, 0.25f, Color.YELLOW);
-        builder.cube(0.8f, 0.8f, 0.8f, 0.25f, 0.25f, 0.25f, Color.PINK);
-        builder.cube(1.1f, 1.1f, 1.1f, 0.25f, 0.25f, 0.25f, Color.PURPLE);
-    ^   */
+            builder.cube(i, 0f, -2.5f, line_width, line_width * 0.5f, 5f, Color.DARK_GRAY);
+            builder.cube(i, 0f, 2.5f, line_width, line_width, 5f, Color.GRAY);
+        }
+
+
         this.mesh = builder.build();
     }
 
     public void update() {
-
     }
 
-    public void render(Camera camera) {
+    public void render(Camera camera, ShaderProgram shader) {
         shader.bind();
         shader.setUniformMatrix("u_projTrans", camera.combined);
         shader.setUniformMatrix("u_modelTrans", transform);
@@ -73,10 +76,7 @@ public class Grid implements Disposable {
     public void dispose() {
         if (this.mesh != null) {
             mesh.dispose();
-            shader.dispose();
-
             mesh = null;
-            shader = null;
         }
     }
 }

@@ -5,7 +5,21 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 public class Utils {
+    public class LogStream extends OutputStream {
+        @Override
+        public void write(int b) throws IOException {
+            log(String.valueOf(b));
+        }
+    }
+
+    public LogStream getLogSteam() {
+        return new LogStream();
+    }
+
     public static void log(String message) {
         StackTraceElement[] stack = new Throwable().getStackTrace();
 

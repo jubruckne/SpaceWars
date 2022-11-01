@@ -21,11 +21,13 @@ public class Lwjgl3Launcher {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("SpaceWars");
         configuration.useVsync(true);
+        configuration.enableGLDebugOutput(true, System.out);
+        configuration.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
         //// Limits FPS to the refresh rate of the currently active monitor.
         //// If you remove the above line and set Vsync to false, you can get unlimited FPS, which can be
         //// useful for testing performance, but can also be very stressful to some hardware.
         //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
-        configuration.setWindowedMode(1366, 768);
+        configuration.setWindowedMode(1240, 768);
         configuration.setWindowPosition(10, 40);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         configuration.setBackBufferConfig(8, 8, 8, 8, 16, 0, 8);

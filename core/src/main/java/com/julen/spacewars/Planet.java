@@ -42,7 +42,7 @@ public class Planet implements Disposable {
 
         // this.material = new Material(ColorAttribute.createDiffuse(1, 1, 1, 1));
         this.material = new Material(
-                TextureAttribute.createDiffuse(new Texture("uv-check.png")));
+                TextureAttribute.createDiffuse(new Texture("world.png")));
 
         this.transform = new Matrix4();
         this.transform.idt();
@@ -56,7 +56,7 @@ public class Planet implements Disposable {
         wireframes = new Mesh[20];
 
         for (int i = 0; i < 20; i++) {
-            create_sphere_section(i, 7);
+            create_sphere_section(i, 10);
         }
     }
 
