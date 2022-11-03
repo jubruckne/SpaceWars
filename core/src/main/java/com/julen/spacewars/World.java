@@ -11,6 +11,8 @@ public class World {
     private final Grid grid;
     //private final Material material;
     private Mesh skybox;
+    private Mesh skybox_wf;
+
     //private Planet planet2;
     Cubemap cm;
 
@@ -63,17 +65,21 @@ public class World {
 */
         this.grid = new Grid(10f, 10f, 10f);
 
-        texture = new Texture(
-                OpenSimplex2.generatePixmap(256, 256, 0.0f, 0.25f, 1)
-        );
+        texture = new Texture(PerlinNoiseGenerator.generatePixmap(1024, 1024, 0, 256, 10));
 
         Builder builder = new Builder();
         builder.hasNormal = false;
         builder.hasColor = true;
-        builder.reset();
-        builder.cube(0, 0, 0f, 1f, 1f, 1f, Color.YELLOW, 3);
+       /* builder.reset();
+        builder.cube(1f, Color.YELLOW, 3);
         builder.spherify(0, 0, 0f, 1f);
         skybox = builder.build();
+*/
+        builder.reset();
+        builder.cube(1f, Color.LIGHT_GRAY, 4);
+        builder.spherify();
+        skybox = builder.build();
+        skybox_wf = builder.build_wireframe();
 
         // planet2 = new Planet(1);
     }
@@ -85,13 +91,16 @@ public class World {
     public void render(Camera camera) {
         shader.bind();
 
+        gl.glDisable(GL_DEPTH_TEST);
         gl.glDisable(GL_CULL_FACE);
         gl.glCullFace(GL_BACK);
 
         shader.setUniformf("u_textureMode", 0);
 
-
         grid.render(camera, shader);
+
+        gl.glEnable(GL_DEPTH_TEST);
+        gl.glDepthFunc(GL_LESS);
 
 
         // #########
@@ -102,8 +111,7 @@ public class World {
         int texture = 3;
         gl.glActiveTexture(texture);
 
-        //gl20.glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS).
-
+        //
         // gl.glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 */
 /*
@@ -112,21 +120,31 @@ public class World {
         cm.bind(texture);
         shader.setUniformf("u_textureMode", 0);
         shader.setUniformi("u_textureCube", texture);
-
 */
 
         texture.bind(7);
 
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        final int GL_TEXTURE_CUBE_MAP_SEAMLESS = 34895;
+        gl.glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
         shader.setUniformf("u_textureMode", 1);
         shader.setUniformi("u_texture", 7);
 
         gl.glEnable(GL_CULL_FACE);
         gl.glCullFace(GL_BACK);
 
-        skybox.render(shader, GL_TRIANGLES);
+        //skybox.render(shader, GL_TRIANGLES);
+
+        gl.glCullFace(GL_BACK);
+        gl.glDepthFunc(GL_LEQUAL);
+        shader.setUniformf("u_textureMode", 0);
 
 
-        gl.glEnable(GL_DEPTH_TEST);
+        skybox_wf.render(shader, GL_LINES);
+
+
         //planet2.render(null, camera);
     }
 }

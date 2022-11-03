@@ -127,6 +127,14 @@ public class Builder {
         cube(x, y, z, width, height, depth, color, 0);
     }
 
+    public void cube(float radius, Color color) {
+        cube(radius, color, 0);
+    }
+
+    public void cube(float radius, Color color, int divisions) {
+        cube(0f, 0f, 0f, radius, radius, radius, color, divisions);
+    }
+
     public void cube(float x, float y, float z, float width, float height, float depth, Color color, int divisions) {
         x = x - width / 2f;
         y = y - height / 2f;
@@ -164,23 +172,43 @@ public class Builder {
             rectangle(f2, b2, b3, f3);
         } else {
             // 0 front ccw
-            rectangle(f1, f2, f3, f4, divisions);
+            rectangle(f1, f2, f3, f4, color, divisions);
 
             // 1 back cw
-            rectangle(b1, b4, b3, b2, divisions);
+            rectangle(b1, b4, b3, b2, color, divisions);
 
             // 2 up ccw
-            rectangle(f4, f3, b3, b4, divisions);
+            rectangle(f4, f3, b3, b4, color, divisions);
 
             // 3 down cw
-            rectangle(f1, b1, b2, f2, divisions);
+            rectangle(f1, b1, b2, f2, color, divisions);
 
             // 4 left cw
-            rectangle(b1, f1, f4, b4, divisions);
+            rectangle(b1, f1, f4, b4, color, divisions);
 
             // 5 right ccw
-            rectangle(f2, b2, b3, f3, divisions);
+            rectangle(f2, b2, b3, f3, color, divisions);
         }
+    }
+
+    public void rectangle(float width, float height, Color color) {
+        rectangle(0f, 0f, 0f, width, height, color, 1);
+    }
+
+    public void rectangle(float width, float height, Color color, int divisions) {
+        rectangle(0f, 0f, 0f, width, height, color, divisions);
+    }
+
+    public void rectangle(float x, float y, float z, float width, float height, Color color, int divisions) {
+        x = x - width / 2f;
+        y = y - height / 2f;
+
+        Vector3 p1 = new Vector3(x, y, z);
+        Vector3 p2 = new Vector3(x + width, y, z);
+        Vector3 p3 = new Vector3(x + width, y + height, z);
+        Vector3 p4 = new Vector3(x, y + height, z);
+
+        rectangle(p1, p2, p3, p4, color, divisions);
     }
 
     public void rectangle(short v1, short v2, short v3, short v4) {
@@ -188,18 +216,22 @@ public class Builder {
         this.triangle(v3, v4, v1);
     }
 
-    public void rectangle(short v1, short v2, short v3, short v4, int divisions) {
-        this.triangle(v1, v2, v3, divisions);
-        this.triangle(v3, v4, v1, divisions);
+    public void rectangle(short v1, short v2, short v3, short v4, Color color, int divisions) {
+        this.triangle(v1, v2, v3, color, divisions);
+        this.triangle(v3, v4, v1, color, divisions);
     }
 
     public void rectangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, Color color) {
+        rectangle(p1, p2, p3, p4, color, 0);
+    }
+
+    public void rectangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, Color color, int divisions) {
         short v1 = vertex(p1, color);
         short v2 = vertex(p2, color);
         short v3 = vertex(p3, color);
         short v4 = vertex(p4, color);
-        this.triangle(v1, v2, v3);
-        this.triangle(v3, v4, v1);
+        this.triangle(v1, v2, v3, color, divisions);
+        this.triangle(v3, v4, v1, color, divisions);
     }
 
     /*
@@ -227,7 +259,7 @@ public class Builder {
         lins++;
     }
 
-    private void triangle(short v1, short v2, short v3, int divisions) {
+    private void triangle(short v1, short v2, short v3, Color color, int divisions) {
         if (divisions == 0) {
             triangle(v1, v2, v3);
         } else {
@@ -239,14 +271,14 @@ public class Builder {
             Vector3 vert2_3 = vert2.cpy().lerp(vert3, 0.5f);
             Vector3 vert3_1 = vert3.cpy().lerp(vert1, 0.5f);
 
-            short v1_2 = vertex(vert1_2, Color.PURPLE);
-            short v2_3 = vertex(vert2_3, Color.PURPLE);
-            short v3_1 = vertex(vert3_1, Color.PURPLE);
+            short v1_2 = vertex(vert1_2, color);
+            short v2_3 = vertex(vert2_3, color);
+            short v3_1 = vertex(vert3_1, color);
 
-            triangle(v1, v1_2, v3_1, divisions - 1);
-            triangle(v1_2, v2, v2_3, divisions - 1);
-            triangle(v1_2, v2_3, v3_1, divisions - 1);
-            triangle(v2_3, v3, v3_1, divisions - 1);
+            triangle(v1, v1_2, v3_1, color, divisions - 1);
+            triangle(v1_2, v2, v2_3, color, divisions - 1);
+            triangle(v1_2, v2_3, v3_1, color, divisions - 1);
+            triangle(v2_3, v3, v3_1, color, divisions - 1);
         }
     }
 
@@ -282,15 +314,14 @@ public class Builder {
         return verts++;
     }
 
-    public void spherify(float centerX, float centerY, float centerZ) {
-        spherify(centerX, centerY, centerZ, 1.0f);
+    public void spherify() {
+        spherify(0f, 0f, 0f, 1.0f);
     }
 
     public void spherify(float centerX, float centerY, float centerZ, float radius) {
         Vector3 vert = new Vector3();
 
         for (short i = 0; i < this.vert_pos; i += stride) {
-            // Utils.log("%.1f", vert);
             vert.set(vertices[i] - centerX, vertices[i + 1] - centerY, vertices[i + 2] - centerZ).setLength(radius);
             vertices[i] = vert.x + centerX;
             vertices[i + 1] = vert.y + centerY;
