@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
-import com.julen.spacewars.Engine.Direction;
 import com.julen.spacewars.Engine.Object;
 
 import static com.badlogic.gdx.Gdx.gl;
@@ -91,7 +90,8 @@ public class World {
                 new Vector3(0.5f, -0.5f, 0.0f),
                 new Vector3(0.5f, 0.5f, 0.0f), Color.GREEN, 1);
 */
-        //builder.spherify();
+
+        /*
         mesh = builder.build();
         wf = builder.build_wireframe();
 
@@ -113,7 +113,7 @@ public class World {
         skybox.setRotation(Direction.Front.vector(), -0.05f);
         skybox.setScale(1.0f);
         gameObjects.add(skybox);
-
+*/
 
         // planet2 = new Planet(1);
     }
