@@ -4,8 +4,8 @@ in vec3 a_position;
 in vec4 a_color;
 in vec3 a_normal;
 
-uniform mat4 u_projTrans;
-uniform mat4 u_modelTrans;
+uniform mat4 u_projMatrix;
+uniform mat4 u_modelMatrix;
 
 out vec4 vColor;
 out vec3 vNormal;
@@ -15,9 +15,9 @@ out vec3 vTexcoord;
 uniform float u_textureMode; // 0 none, 1 map, 2 cubemap
 
 void main() {
-    gl_Position = u_projTrans * u_modelTrans * vec4(a_position, 1);
+    gl_Position = u_projMatrix * u_modelMatrix * vec4(a_position, 1);
 
-    vPosition = u_projTrans * vec4(a_position, 1.0);
+    vPosition = u_projMatrix * vec4(a_position, 1.0);
     vNormal = (vec4(a_position, 1.0)).xyz;
 
     if (u_textureMode == 0.0) {

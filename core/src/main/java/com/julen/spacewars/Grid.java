@@ -66,8 +66,8 @@ public class Grid implements Disposable {
 
     public void render(Camera camera, ShaderProgram shader) {
         shader.bind();
-        shader.setUniformMatrix("u_projTrans", camera.combined);
-        shader.setUniformMatrix("u_modelTrans", transform);
+        shader.setUniformMatrix("u_projMatrix", camera.combined);
+        shader.setUniformMatrix("u_modelMatrix", transform);
 
         mesh.render(shader, GL20.GL_TRIANGLES);
     }

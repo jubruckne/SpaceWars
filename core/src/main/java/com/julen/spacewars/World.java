@@ -3,17 +3,16 @@ package com.julen.spacewars;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.Array;
+import com.julen.spacewars.Engine.Direction;
+import com.julen.spacewars.Engine.Object;
 
 import static com.badlogic.gdx.Gdx.gl;
 import static com.badlogic.gdx.graphics.GL20.*;
 
 public class World {
     private final Grid grid;
-    //private final Material material;
-    private Mesh skybox;
-    private Mesh skybox_wf;
-
-    //private Planet planet2;
+    private final Array<Object> gameObjects = new Array<>();
     Cubemap cm;
 
     Texture texture;
@@ -68,18 +67,53 @@ public class World {
         texture = new Texture(PerlinNoiseGenerator.generatePixmap(1024, 1024, 0, 256, 10));
 
         Builder builder = new Builder();
-        builder.hasNormal = false;
-        builder.hasColor = true;
-       /* builder.reset();
-        builder.cube(1f, Color.YELLOW, 3);
-        builder.spherify(0, 0, 0f, 1f);
-        skybox = builder.build();
-*/
         builder.reset();
-        builder.cube(1f, Color.LIGHT_GRAY, 4);
-        builder.spherify();
-        skybox = builder.build();
-        skybox_wf = builder.build_wireframe();
+        builder.hasNormal = true;
+        builder.hasColor = false;
+        builder.cube(1f, Color.YELLOW, 1);
+        // builder.spherify(1f);
+
+        Mesh mesh = builder.build();
+        Mesh wf = builder.build_wireframe();
+
+        Object skybox = new Object("skybox",
+                new Mesh[]{wf, mesh}, texture);
+        skybox.wireframe = true;
+        skybox.setPosition(0, 0, 0);
+        skybox.setScale(1.0f);
+        gameObjects.add(skybox);
+
+        builder.reset();
+        builder.rectangle(1, 1, Color.LIGHT_GRAY, 2);
+
+        /*
+        builder.triangle(new Vector3(-0.5f, -0.5f, 0.0f),
+                new Vector3(0.5f, -0.5f, 0.0f),
+                new Vector3(0.5f, 0.5f, 0.0f), Color.GREEN, 1);
+*/
+        //builder.spherify();
+        mesh = builder.build();
+        wf = builder.build_wireframe();
+
+        skybox = new Object("skybox", new Mesh[]{wf, mesh}, texture);
+        skybox.wireframe = true;
+        skybox.setPosition(0.5f, 0.5f, 0.5f);
+        skybox.setScale(2.0f);
+        gameObjects.add(skybox);
+
+        skybox = new Object("skybox", new Mesh[]{wf, mesh}, texture);
+        skybox.wireframe = true;
+        skybox.setPosition(0.5f, 0.5f, 0.75f);
+        skybox.setScale(1.5f);
+        gameObjects.add(skybox);
+
+        skybox = new Object("skybox", new Mesh[]{wf, mesh}, texture);
+        skybox.wireframe = true;
+        skybox.setPosition(0.5f, 0.5f, 1.0f);
+        skybox.setRotation(Direction.Front.vector(), -0.05f);
+        skybox.setScale(1.0f);
+        gameObjects.add(skybox);
+
 
         // planet2 = new Planet(1);
     }
@@ -98,9 +132,6 @@ public class World {
         shader.setUniformf("u_textureMode", 0);
 
         grid.render(camera, shader);
-
-        gl.glEnable(GL_DEPTH_TEST);
-        gl.glDepthFunc(GL_LESS);
 
 
         // #########
@@ -122,29 +153,16 @@ public class World {
         shader.setUniformi("u_textureCube", texture);
 */
 
-        texture.bind(7);
-
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        final int GL_TEXTURE_CUBE_MAP_SEAMLESS = 34895;
-        gl.glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-        shader.setUniformf("u_textureMode", 1);
-        shader.setUniformi("u_texture", 7);
-
-        gl.glEnable(GL_CULL_FACE);
-        gl.glCullFace(GL_BACK);
 
         //skybox.render(shader, GL_TRIANGLES);
 
+        gl.glDisable(GL_DEPTH_TEST);
         gl.glCullFace(GL_BACK);
         gl.glDepthFunc(GL_LEQUAL);
         shader.setUniformf("u_textureMode", 0);
 
-
-        skybox_wf.render(shader, GL_LINES);
-
-
-        //planet2.render(null, camera);
+        for (Object gameObject : gameObjects) {
+            gameObject.render(shader);
+        }
     }
 }

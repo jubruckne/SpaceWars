@@ -28,11 +28,8 @@ public class Utils {
     }
 
     public static void log(String message, Object... args) {
-        StackTraceElement[] stack = new Throwable().getStackTrace();
         message = format(message, args);
-
-        String ctx = stack[1].getFileName().replace(".java", ".") + stack[1].getMethodName() + "(" + stack[1].getLineNumber() + ")";
-        Gdx.app.log(ctx, message);
+        log(message);
     }
 
     public static String format(String format, Object... args) {

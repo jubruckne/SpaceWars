@@ -72,7 +72,7 @@ public class Builder {
         mesh.setVertices(vertices, 0, vert_pos);
         mesh.setIndices(lines, 0, lin_pos);
 
-        Utils.log("%s: Vertices = %i, Triangles = %i", this.getClass().getSimpleName(), (int) verts, (int) tris);
+        Utils.log("%s: Vertices = %i, Triangles = %i", this.getClass().getSimpleName(), (int) vert_pos, (int) tri_pos);
 
         return mesh;
     }
@@ -192,7 +192,7 @@ public class Builder {
     }
 
     public void rectangle(float width, float height, Color color) {
-        rectangle(0f, 0f, 0f, width, height, color, 1);
+        rectangle(0f, 0f, 0f, width, height, color, 0);
     }
 
     public void rectangle(float width, float height, Color color, int divisions) {
@@ -250,9 +250,11 @@ public class Builder {
 
         lines[lin_pos++] = v1;
         lines[lin_pos++] = v2;
+        lins++;
 
         lines[lin_pos++] = v2;
         lines[lin_pos++] = v3;
+        lins++;
 
         lines[lin_pos++] = v3;
         lines[lin_pos++] = v1;
@@ -275,18 +277,22 @@ public class Builder {
             short v2_3 = vertex(vert2_3, color);
             short v3_1 = vertex(vert3_1, color);
 
-            triangle(v1, v1_2, v3_1, color, divisions - 1);
-            triangle(v1_2, v2, v2_3, color, divisions - 1);
-            triangle(v1_2, v2_3, v3_1, color, divisions - 1);
-            triangle(v2_3, v3, v3_1, color, divisions - 1);
+            triangle(v1, v1_2, v3_1, Color.GREEN, divisions - 1);
+            triangle(v1_2, v2, v2_3, Color.BLUE, divisions - 1);
+            triangle(v1_2, v2_3, v3_1, Color.RED, divisions - 1);
+            triangle(v2_3, v3, v3_1, Color.YELLOW, divisions - 1);
         }
     }
 
     public void triangle(Vector3 p1, Vector3 p2, Vector3 p3, Color color) {
+        triangle(p1, p2, p3, color, 0);
+    }
+
+    public void triangle(Vector3 p1, Vector3 p2, Vector3 p3, Color color, int divisions) {
         short v1 = vertex(p1, color);
         short v2 = vertex(p2, color);
         short v3 = vertex(p3, color);
-        this.triangle(v1, v2, v3);
+        this.triangle(v1, v2, v3, color, divisions);
     }
 
     public short vertex(Vector3 pos, Color color) {
@@ -314,8 +320,8 @@ public class Builder {
         return verts++;
     }
 
-    public void spherify() {
-        spherify(0f, 0f, 0f, 1.0f);
+    public void spherify(float radius) {
+        spherify(0f, 0f, 0f, radius);
     }
 
     public void spherify(float centerX, float centerY, float centerZ, float radius) {
