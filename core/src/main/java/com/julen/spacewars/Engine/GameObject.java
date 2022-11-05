@@ -1,7 +1,7 @@
 package com.julen.spacewars.Engine;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -9,10 +9,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
-import static com.badlogic.gdx.Gdx.gl;
 import static com.badlogic.gdx.graphics.GL20.*;
 
-public class Object {
+public class GameObject {
     private String id;
     private Color color;
     private final Vector3 position = new Vector3(0f, 0f, 0f);
@@ -26,22 +25,22 @@ public class Object {
     public boolean depthtest = false;
     public boolean wireframe = false; //wireframe must be first mesh if true
 
-    public Object(String id, Mesh mesh) {
+    public GameObject(String id, Mesh mesh) {
         this(id, new Mesh[]{mesh}, Color.WHITE);
     }
 
-    public Object(String id, Mesh[] meshes) {
+    public GameObject(String id, Mesh[] meshes) {
         this(id, meshes, Color.WHITE);
     }
 
-    public Object(String id, Mesh[] meshes, Color color) {
+    public GameObject(String id, Mesh[] meshes, Color color) {
         this.id = id;
         this.meshes = meshes;
         this.color = color;
         this.texture = null;
     }
 
-    public Object(String id, Mesh[] meshes, Texture texture) {
+    public GameObject(String id, Mesh[] meshes, Texture texture) {
         this.id = id;
         this.meshes = meshes;
         this.color = Color.WHITE;
@@ -80,36 +79,45 @@ public class Object {
     }
 
     public void render(ShaderProgram shader) {
-        texture.bind(7);
+        if (texture != null)
+            texture.bind(7);
 
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        Gdx.gl20.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        Gdx.gl20.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-        final int GL_TEXTURE_CUBE_MAP_SEAMLESS = 34895;
-        gl.glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-        shader.setUniformf("u_textureMode", 1);
-        shader.setUniformi("u_texture", 7);
-
+        //final int GL_TEXTURE_CUBE_MAP_SEAMLESS = 34895;
+        //gl.glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+        if (this.texture == null)
+            shader.setUniformf("u_textureMode", 0.0f);
+        else {
+            shader.setUniformf("u_textureMode", 1.0f);
+        }
         Matrix4 modelMatrix = new Matrix4().set(
                 position, rotation, new Vector3(scale, scale, scale)
         );
+        shader.setUniformi("u_texture", 7);
+
+
+        modelMatrix.idt();
 
         shader.setUniformMatrix("u_modelMatrix", modelMatrix);
 
-        gl.glEnable(GL_DEPTH_TEST);
-        gl.glDepthFunc(GL_LESS);
+        Gdx.gl20.glDisable(GL_CULL_FACE);
+        Gdx.gl20.glCullFace(GL_BACK);
+
+        Gdx.gl20.glDisable(GL_DEPTH_TEST);
+        Gdx.gl20.glDepthFunc(GL_LESS);
 
         for (int i = (this.wireframe ? 1 : 0); i < this.meshes.length; i++) {
-            meshes[i].render(shader, GL20.GL_TRIANGLES);
+            meshes[i].render(shader, GL_TRIANGLES);
         }
-        gl.glDisable(GL_CULL_FACE);
-        gl.glCullFace(GL_BACK);
+        Gdx.gl20.glDisable(GL_CULL_FACE);
+        Gdx.gl20.glCullFace(GL_BACK);
 
         if (this.wireframe) {
-            gl.glDepthFunc(GL_LEQUAL);
+            Gdx.gl20.glDepthFunc(GL_LEQUAL);
             shader.setUniformf("u_textureMode", 0);
-            meshes[0].render(shader, GL20.GL_LINES);
+            meshes[0].render(shader, GL_LINES);
         }
     }
-
 }

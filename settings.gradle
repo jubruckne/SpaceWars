@@ -1,1 +1,1 @@
-include 'shared', 'lwjgl3', 'server', 'ios-moe', 'ios', 'core'
+include 'shared', 'lwjgl3', 'ios-moe', 'ios', 'core'

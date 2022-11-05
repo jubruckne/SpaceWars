@@ -9,10 +9,10 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Builder {
     private int stride;
-    final private float[] vertices;
+    private float[] vertices;
     private short vert_pos;
     private short verts;
-    final private short[] triangles;
+    private short[] triangles;
     private short tri_pos;
     private short tris;
     private short[] lines;
@@ -23,13 +23,13 @@ public class Builder {
     public boolean hasNormal = true;
 
     public Builder() {
-        vertices = new float[Short.MAX_VALUE];
-        triangles = new short[Short.MAX_VALUE];
-        lines = new short[Short.MAX_VALUE];
         reset();
     }
 
     public void reset() {
+        vertices = new float[Short.MAX_VALUE];
+        triangles = new short[Short.MAX_VALUE];
+        lines = new short[Short.MAX_VALUE];
         verts = 0;
         vert_pos = 0;
 

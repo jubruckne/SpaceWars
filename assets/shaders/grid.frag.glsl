@@ -1,4 +1,4 @@
-#version 410
+#version 330
 
 in vec4 vColor;
 in vec3 vNormal;
@@ -19,4 +19,6 @@ void main() {
     } else {
         FragColor = texture(u_textureCube, normalize(vNormal).xyz);
     }
+
+    // FragColor = vec4(1.0, 1.0, 0.5, 1.0);
 }

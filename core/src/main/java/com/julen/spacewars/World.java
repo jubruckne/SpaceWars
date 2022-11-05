@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
-import com.julen.spacewars.Engine.Object;
+import com.julen.spacewars.Engine.GameObject;
 
 import static com.badlogic.gdx.Gdx.gl;
 import static com.badlogic.gdx.graphics.GL20.*;
 
 public class World {
     private final Grid grid;
-    private final Array<Object> gameObjects = new Array<>();
+    private final Array<GameObject> gameObjects = new Array<>();
     Cubemap cm;
 
     Texture texture;
@@ -43,6 +43,8 @@ public class World {
                 Gdx.files.internal("cubemap/sh_bk.png"),
                 Gdx.files.internal("cubemap/sh_ft.png"));
 */
+
+        /*
         cm = new Cubemap(
                 Gdx.files.internal("cubemap/teide/posx.jpg"),
                 Gdx.files.internal("cubemap/teide/negx.jpg"),
@@ -51,7 +53,7 @@ public class World {
                 Gdx.files.internal("cubemap/teide/posz.jpg"),
                 Gdx.files.internal("cubemap/teide/negz.jpg"));
 
-
+*/
 /*
         cm = new Cubemap(
                 Gdx.files.internal("cubemap/grid_posx.png"),
@@ -68,22 +70,19 @@ public class World {
         Builder builder = new Builder();
         builder.reset();
         builder.hasNormal = true;
-        builder.hasColor = false;
-        builder.cube(1f, Color.YELLOW, 1);
+        builder.hasColor = true;
+        builder.cube(1f, Color.DARK_GRAY, 1);
         // builder.spherify(1f);
 
-        Mesh mesh = builder.build();
-        Mesh wf = builder.build_wireframe();
-
-        Object skybox = new Object("skybox",
-                new Mesh[]{wf, mesh}, texture);
-        skybox.wireframe = true;
+        GameObject skybox = new GameObject("skybox",
+                new Mesh[]{builder.build(), builder.build_wireframe()}, Color.BROWN);
+        skybox.wireframe = false;
         skybox.setPosition(0, 0, 0);
         skybox.setScale(1.0f);
         gameObjects.add(skybox);
 
         builder.reset();
-        builder.rectangle(1, 1, Color.LIGHT_GRAY, 2);
+        //builder.rectangle(1, 1, Color.LIGHT_GRAY, 2);
 
         /*
         builder.triangle(new Vector3(-0.5f, -0.5f, 0.0f),
@@ -116,6 +115,7 @@ public class World {
 */
 
         // planet2 = new Planet(1);
+
     }
 
     public void update() {
@@ -156,12 +156,7 @@ public class World {
 
         //skybox.render(shader, GL_TRIANGLES);
 
-        gl.glDisable(GL_DEPTH_TEST);
-        gl.glCullFace(GL_BACK);
-        gl.glDepthFunc(GL_LEQUAL);
-        shader.setUniformf("u_textureMode", 0);
-
-        for (Object gameObject : gameObjects) {
+        for (GameObject gameObject : gameObjects) {
             gameObject.render(shader);
         }
     }

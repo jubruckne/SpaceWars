@@ -30,7 +30,7 @@ public class Lwjgl3Launcher {
         configuration.setWindowedMode(1240, 768);
         configuration.setWindowPosition(10, 40);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
-        configuration.setBackBufferConfig(8, 8, 8, 8, 16, 0, 8);
+        configuration.setBackBufferConfig(8, 8, 8, 8, 8, 0, 4);
         Graphics.DisplayMode displayMode = Lwjgl3ApplicationConfiguration.getDisplayMode();
         //configuration.setMaximized(true);
         // configuration.setOpenGLEmulation(GL30, 3, 2);
