@@ -213,7 +213,12 @@ public class Main extends ApplicationAdapter implements PlayerController.IEvents
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+
+        camera.viewportWidth = Gdx.graphics.getWidth();
+        camera.viewportHeight = Gdx.graphics.getHeight();
         camera.update();
+
+        Utils.log("Window resize: %i, %i", width, height);
     }
 
     @Override

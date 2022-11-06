@@ -6,6 +6,7 @@ attribute vec3 a_normal;
 
 uniform mat4 u_projTrans;
 uniform mat4 u_modelTrans;
+uniform float u_time;
 
 varying vec4 vColor;
 varying vec3 vNormal;

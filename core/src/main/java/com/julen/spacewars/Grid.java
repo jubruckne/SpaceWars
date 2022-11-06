@@ -57,8 +57,7 @@ public class Grid implements Disposable {
             builder.cube(i, 0f, 2.5f, line_width, line_width, 5f, Color.GRAY);
         }
 
-
-        this.mesh = builder.build();
+        this.mesh = builder.build_body();
     }
 
     public void update() {

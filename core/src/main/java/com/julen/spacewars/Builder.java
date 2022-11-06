@@ -30,6 +30,7 @@ public class Builder {
         vertices = new float[Short.MAX_VALUE];
         triangles = new short[Short.MAX_VALUE];
         lines = new short[Short.MAX_VALUE];
+
         verts = 0;
         vert_pos = 0;
 
@@ -44,7 +45,7 @@ public class Builder {
                 (hasColor ? 4 : 0);
     }
 
-    public Mesh build_wireframe() {
+    private Mesh build_wireframe() {
         VertexAttributes va;
 
         if (hasColor && hasNormal)
@@ -68,7 +69,7 @@ public class Builder {
                     new VertexAttribute(VertexAttributes.Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE)
             );
 
-        Mesh mesh = new Mesh(true, vert_pos, lin_pos, va);
+        Mesh mesh = new Mesh(false, vert_pos, lin_pos, va);
         mesh.setVertices(vertices, 0, vert_pos);
         mesh.setIndices(lines, 0, lin_pos);
 
@@ -77,7 +78,25 @@ public class Builder {
         return mesh;
     }
 
-    public Mesh build() {
+    public Mesh[] build() {
+        return build(true);
+    }
+
+    public Mesh[] build(boolean wireframe) {
+        Mesh[] meshes;
+        if (wireframe) {
+            meshes = new Mesh[2];
+            meshes[0] = build_wireframe();
+            meshes[1] = build_body();
+        } else {
+            meshes = new Mesh[1];
+            meshes[0] = build_body();
+        }
+
+        return meshes;
+    }
+
+    public Mesh build_body() {
         VertexAttributes va;
 
         if (hasColor && hasNormal)
@@ -191,6 +210,143 @@ public class Builder {
         }
     }
 
+    public void rectangle2(float radius, Color color, int resolution) {
+        this.rectangle2(0f, 0f, 0f, radius, radius, color, resolution);
+    }
+
+    public void rectangle4(float radius, Color color, int resolution) {
+        this.rectangle4(0f, 0f, 0f, radius, radius, color, resolution);
+    }
+
+    public void rectangle4(float x, float y, float z, float width, float height, Color color, int resolution) {
+        /*
+
+        4-------3
+        | \   / |
+        |   x   |
+        | /   \ |
+        1-------2
+
+        width = 1
+        height = 1
+        resolution = 5
+
+        0  1  2  3  4
+        5  6  7  8  9
+       10 11 12 13 14
+       15 16 17 18 19
+       20 21 22 23 24
+
+        */
+
+        x -= width * .5f;
+        y -= height * .5f;
+
+        short v_bottom_left = 0;
+        short v_bottom_right = 0;
+        short v_top_right = 0;
+        short v_top_left = 0;
+        short v_center = 0;
+
+        for (int i = 0; i < (resolution + 1) * (resolution + 1); i++) {
+            int sx = i % (resolution + 1);
+            int sy = i / (resolution + 1);
+
+            vertex(x + width * sx / resolution, y + height * sy / resolution, z, color);
+        }
+
+        for (int i = 0; i < resolution * resolution; i++) {
+            int sx = i % resolution;
+            int sy = i / resolution;
+
+            v_bottom_left = (short) (sx + sy * (resolution + 1));
+            v_bottom_right = (short) (v_bottom_left + 1);
+
+            v_top_left = (short) (sx + (sy + 1) * (resolution + 1));
+            v_top_right = (short) (v_top_left + 1);
+
+            v_center = vertex(x + width * (sx + 0.5f) / (float) resolution, y + height * (sy + 0.5f) / (float) resolution, z, color);
+
+            rectangle4(v_bottom_left, v_bottom_right, v_top_right, v_top_left, v_center);
+        }
+    }
+
+    private void rectangle4(short v1, short v2, short v3, short v4, short vc) {
+        // Utils.log("Rectangle (%i, %i, %i, %i (%i))", v1, v2, v3, v4, vc);
+
+        //top
+        triangles[tri_pos++] = v3;
+        triangles[tri_pos++] = vc;
+        triangles[tri_pos++] = v2;
+        tris++;
+
+        lines[lin_pos++] = v3;
+        lines[lin_pos++] = vc;
+        lins++;
+
+        lines[lin_pos++] = vc;
+        lines[lin_pos++] = v2;
+        lins++;
+
+        lines[lin_pos++] = v2;
+        lines[lin_pos++] = v3;
+        lins++;
+
+        //bottom
+        triangles[tri_pos++] = v1;
+        triangles[tri_pos++] = vc;
+        triangles[tri_pos++] = v4;
+        tris++;
+
+        lines[lin_pos++] = v1;
+        lines[lin_pos++] = vc;
+        lins++;
+
+        lines[lin_pos++] = vc;
+        lines[lin_pos++] = v4;
+        lins++;
+
+        lines[lin_pos++] = v4;
+        lines[lin_pos++] = v1;
+        lins++;
+
+        // left
+        triangles[tri_pos++] = v1;
+        triangles[tri_pos++] = v2;
+        triangles[tri_pos++] = vc;
+        tris++;
+
+        lines[lin_pos++] = v1;
+        lines[lin_pos++] = v2;
+        lins++;
+
+        lines[lin_pos++] = v2;
+        lines[lin_pos++] = vc;
+        lins++;
+
+        lines[lin_pos++] = vc;
+        lines[lin_pos++] = v1;
+        lins++;
+
+        //right
+        triangles[tri_pos++] = v3;
+        triangles[tri_pos++] = v4;
+        triangles[tri_pos++] = vc;
+        tris++;
+
+        lines[lin_pos++] = v3;
+        lines[lin_pos++] = v4;
+        lins++;
+
+        lines[lin_pos++] = v4;
+        lines[lin_pos++] = vc;
+        lins++;
+
+        lines[lin_pos++] = vc;
+        lines[lin_pos++] = v3;
+        lins++;
+    }
+
     public void rectangle(float width, float height, Color color) {
         rectangle(0f, 0f, 0f, width, height, color, 0);
     }
@@ -212,6 +368,9 @@ public class Builder {
     }
 
     public void rectangle(short v1, short v2, short v3, short v4) {
+        Utils.log("rectangle");
+        Utils.log("");
+
         this.triangle(v1, v2, v3);
         this.triangle(v3, v4, v1);
     }
@@ -277,10 +436,10 @@ public class Builder {
             short v2_3 = vertex(vert2_3, color);
             short v3_1 = vertex(vert3_1, color);
 
-            triangle(v1, v1_2, v3_1, Color.GREEN, divisions - 1);
-            triangle(v1_2, v2, v2_3, Color.BLUE, divisions - 1);
-            triangle(v1_2, v2_3, v3_1, Color.RED, divisions - 1);
-            triangle(v2_3, v3, v3_1, Color.YELLOW, divisions - 1);
+            triangle(v1, v1_2, v3_1, color, divisions - 1);
+            triangle(v1_2, v2, v2_3, color, divisions - 1);
+            triangle(v1_2, v2_3, v3_1, color, divisions - 1);
+            triangle(v2_3, v3, v3_1, color, divisions - 1);
         }
     }
 
@@ -300,6 +459,8 @@ public class Builder {
     }
 
     public short vertex(float x, float y, float z, Color color) {
+        // Utils.log("Vertex (%.1f, %.1f, %.1f)", x, y, z);
+
         vertices[vert_pos++] = x;
         vertices[vert_pos++] = y;
         vertices[vert_pos++] = z;

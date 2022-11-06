@@ -5,13 +5,14 @@ in vec3 a_normal;
 
 uniform mat4 u_projMatrix;
 uniform mat4 u_modelMatrix;
+uniform float u_time;
 
 out vec4 vColor;
 out vec3 vNormal;
 out vec4 vPosition;
 out vec3 vTexcoord;
 
-uniform float u_textureMode; // 0 none, 1 map, 2 cubemap
+uniform float u_textureMode; // -1 wireframe, 0 shaded, 1 map, 2 cubemap
 
 void main() {
     gl_Position = u_projMatrix * u_modelMatrix * vec4(a_position, 1.0);
@@ -24,6 +25,19 @@ void main() {
         vTexcoord = vec3(a_position.xy, 0.0) + 0.5;
         vTexcoord = vec3(vNormal.x / 2.0 + 0.5, vNormal.y / 2.0, 1.0);
         vTexcoord = vec3(vTexcoord.y, -vTexcoord.x, 1.0);
+    } else if (u_textureMode == 2.0) {
+        vTexcoord = vNormal.xyz;
+    } else if (u_textureMode == -1.0) {
+        gl_PointSize = 5.0;
+
+        float glow = (sin((u_time * 1.1 + gl_VertexID * 2.333) * 0.035) + 0.35) * 0.15 + 0.05;
+
+        vColor = vec4(
+            min(1.0, a_color.r + glow),
+            min(1.0, a_color.g + glow),
+            min(1.0, a_color.b + glow),
+            1.0);
     }
+
 }
 

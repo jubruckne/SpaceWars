@@ -1,7 +1,10 @@
 package com.julen.spacewars;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cubemap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import com.julen.spacewars.Engine.GameObject;
@@ -73,7 +76,7 @@ public class World {
         builder.hasColor = true;
         builder.cube(1f, Color.DARK_GRAY, 1);
         // builder.spherify(1f);
-
+/*
         GameObject skybox = new GameObject("skybox",
                 new Mesh[]{builder.build(), builder.build_wireframe()}, Color.BROWN);
         skybox.wireframe = false;
@@ -84,7 +87,7 @@ public class World {
         builder.reset();
         //builder.rectangle(1, 1, Color.LIGHT_GRAY, 2);
 
-        /*
+
         builder.triangle(new Vector3(-0.5f, -0.5f, 0.0f),
                 new Vector3(0.5f, -0.5f, 0.0f),
                 new Vector3(0.5f, 0.5f, 0.0f), Color.GREEN, 1);
@@ -105,14 +108,31 @@ public class World {
         skybox.setPosition(0.5f, 0.5f, 0.75f);
         skybox.setScale(1.5f);
         gameObjects.add(skybox);
+*/
 
-        skybox = new Object("skybox", new Mesh[]{wf, mesh}, texture);
-        skybox.wireframe = true;
-        skybox.setPosition(0.5f, 0.5f, 1.0f);
-        skybox.setRotation(Direction.Front.vector(), -0.05f);
+        builder.reset();
+        builder.rectangle(1, 1, Color.TEAL, 2);
+        GameObject skybox = new GameObject("old quad", builder.build());
+        skybox.setPosition(0.55f, 0.55f, 0.0f);
         skybox.setScale(1.0f);
         gameObjects.add(skybox);
-*/
+
+        Utils.log("old quad");
+        builder.reset();
+        builder.rectangle(1, 1, Color.FIREBRICK, 5);
+        skybox = new GameObject("new quad", builder.build());
+        skybox.setPosition(-0.55f, 0.55f, 0.0f);
+        skybox.setScale(1.0f);
+        gameObjects.add(skybox);
+
+        Utils.log("new quad");
+
+        builder.reset();
+        builder.rectangle4(1, Color.MAROON, 36);
+        skybox = new GameObject("new quad", builder.build());
+        skybox.setPosition(-0.55f, -0.55f, 0.0f);
+        skybox.setScale(1.0f);
+        gameObjects.add(skybox);
 
         // planet2 = new Planet(1);
 
