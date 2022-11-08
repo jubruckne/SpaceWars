@@ -18,12 +18,27 @@ public class GameObject {
     private final Quaternion rotation = new Quaternion(0f, 0f, 0f, 1f);
     private float scale = 1f;
     private final Matrix4 modelMatrix = new Matrix4(position, rotation, new Vector3(scale, scale, scale));
-    private Mesh[] meshes;
+    protected Mesh[] meshes;
     private Texture texture;
+
+    public final Vector3 right = new Vector3(1f, 0f, 0f); // x+
+    public final Vector3 left = new Vector3(-1f, 0f, 0f); // x-
+
+    public final Vector3 up = new Vector3(0f, 1f, 0f);    // y+
+    public final Vector3 down = new Vector3(0f, -1f, 0f); // y-
+
+    public final Vector3 forward = new Vector3(0f, 0f, -1f); //z-
+    public final Vector3 back = new Vector3(0f, 0f, 1f);   //z+
 
     public boolean cullface = false;
     public boolean depthtest = false;
     public boolean wireframe = false; //wireframe must be first mesh if true
+
+
+    public GameObject(String id) {
+        this.id = id;
+        this.color = color;
+    }
 
     public GameObject(String id, Mesh mesh) {
         this(id, new Mesh[]{mesh}, Color.WHITE);
@@ -34,17 +49,15 @@ public class GameObject {
     }
 
     public GameObject(String id, Mesh[] meshes, Color color) {
-        this.id = id;
+        this(id);
         this.meshes = meshes;
         this.color = color;
-        this.texture = null;
         this.wireframe = meshes.length > 1;
     }
 
     public GameObject(String id, Mesh[] meshes, Texture texture) {
-        this.id = id;
+        this(id);
         this.meshes = meshes;
-        this.color = Color.WHITE;
         this.texture = texture;
         this.wireframe = meshes.length > 1;
     }
@@ -60,7 +73,7 @@ public class GameObject {
     }
 
     public void setRotation(float axisX, float axisY, float axisZ, float angle) {
-        setRotation(new Quaternion(axisX, axisY, axisZ, angle));
+        setRotation(new Quaternion(new Vector3(axisX, axisY, axisZ), angle));
     }
 
     public void setRotation(Vector3 axis, float angle) {
@@ -73,7 +86,7 @@ public class GameObject {
     }
 
     public void setRotation(Direction direction) {
-        setRotation(Direction.Front.vector(), 0.0f);
+        setRotation(Direction.Forward.vector(), 0.0f);
     }
 
     public void setScale(float v) {

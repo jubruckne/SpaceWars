@@ -2,26 +2,30 @@ package com.julen.spacewars;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import com.julen.spacewars.Engine.GameObject;
+import com.julen.spacewars.Engine.Planet;
 
 import static com.badlogic.gdx.Gdx.gl;
 import static com.badlogic.gdx.graphics.GL20.*;
 
 public class World {
-    private final Grid grid;
+    private Grid grid = null;
     private final Array<GameObject> gameObjects = new Array<>();
     Cubemap cm;
 
     Texture texture;
 
+    Planet planet;
+
     private final ShaderProgram shader;
 
     public World() {
+        planet = new Planet("planet");
+
         ShaderProgram.pedantic = true;
         shader = new ShaderProgram(
                 Gdx.files.internal("shaders/grid.vert.glsl"),
@@ -74,7 +78,8 @@ public class World {
         builder.reset();
         builder.hasNormal = true;
         builder.hasColor = true;
-        builder.cube(1f, Color.DARK_GRAY, 1);
+
+//        builder.cube(1f, Color.DARK_GRAY, 1);
         // builder.spherify(1f);
 /*
         GameObject skybox = new GameObject("skybox",
@@ -109,7 +114,7 @@ public class World {
         skybox.setScale(1.5f);
         gameObjects.add(skybox);
 */
-
+/*
         builder.reset();
         builder.rectangle(1, 1, Color.TEAL, 2);
         GameObject skybox = new GameObject("old quad", builder.build());
@@ -119,7 +124,7 @@ public class World {
 
         Utils.log("old quad");
         builder.reset();
-        builder.rectangle(1, 1, Color.FIREBRICK, 5);
+        builder.rectangle(1, 1, Color.FIREBRICK, 3);
         skybox = new GameObject("new quad", builder.build());
         skybox.setPosition(-0.55f, 0.55f, 0.0f);
         skybox.setScale(1.0f);
@@ -128,18 +133,41 @@ public class World {
         Utils.log("new quad");
 
         builder.reset();
-        builder.rectangle4(1, Color.MAROON, 36);
+        builder.rectangle4(1, Color.MAROON, 46);
         skybox = new GameObject("new quad", builder.build());
         skybox.setPosition(-0.55f, -0.55f, 0.0f);
         skybox.setScale(1.0f);
         gameObjects.add(skybox);
 
-        // planet2 = new Planet(1);
+        Utils.log("new quad 2");
+*/
 
+        /*
+        builder.reset();
+        builder.logging = true;
+        builder.rectangle2(1f, Color.FOREST, 9);
+        //builder.spherify(-0.5f, 0.5f, -0.5f, 1f);
+        GameObject skybox = new GameObject("new quad", builder.build());
+        skybox.setPosition(0, 1.5f, 0);
+        skybox.setScale(1.0f);
+        gameObjects.add(skybox);
+
+        builder.reset();
+        builder.logging = true;
+        builder.cube2(1f, Color.FOREST, 9);
+        //builder.spherify(-0.5f, 0.5f, -0.5f, 1f);
+        skybox = new GameObject("new quad", builder.build());
+        skybox.setPosition(0, 0f, 0);
+        skybox.setScale(1.0f);
+        gameObjects.add(skybox);
+*/
+
+        // planet2 = new Planet(1);
     }
 
     public void update() {
-        grid.update();
+        if (grid != null)
+            grid.update();
     }
 
     public void render(Camera camera) {
@@ -151,8 +179,8 @@ public class World {
 
         shader.setUniformf("u_textureMode", 0);
 
-        grid.render(camera, shader);
-
+        if (grid != null)
+            grid.render(camera, shader);
 
         // #########
 
@@ -175,6 +203,8 @@ public class World {
 
 
         //skybox.render(shader, GL_TRIANGLES);
+
+        planet.render(shader);
 
         for (GameObject gameObject : gameObjects) {
             gameObject.render(shader);

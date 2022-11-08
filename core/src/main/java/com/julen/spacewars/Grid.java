@@ -27,9 +27,8 @@ public class Grid implements Disposable {
 
     private void setup() {
         Builder builder = new Builder();
-        builder.hasNormal = false;
+        builder.hasNormal = true;
         builder.hasColor = true;
-
         final float line_width = 0.001f;
         final float line_spacing = 0.25f;
 

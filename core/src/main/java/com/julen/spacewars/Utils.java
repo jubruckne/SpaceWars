@@ -45,6 +45,8 @@ public class Utils {
                 str = str.replaceFirst("%s", arg.toString());
             } else if (arg instanceof Integer) {
                 str = str.replaceFirst("%i", arg.toString());
+            } else if (arg instanceof Short) {
+                str = str.replaceFirst("%i", arg.toString());
             } else if (arg instanceof Rectangle) {
                 float x, y, w, h;
                 x = ((Rectangle) arg).x;
