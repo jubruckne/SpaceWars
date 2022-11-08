@@ -22,10 +22,10 @@ public enum Direction {
         if (this == Back) return -1;
         if (this == Forward) return -1;
 
-        if (this == Left) return 1;
-        if (this == Right) return 1;
+        if (this == Left) return -1;
+        if (this == Right) return -1;
 
-        if (this == Up) return 1;
+        if (this == Up) return -1;
         if (this == Down) return -1;
 
         return 1;

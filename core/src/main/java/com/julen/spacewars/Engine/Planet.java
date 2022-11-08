@@ -35,8 +35,10 @@ public class Planet extends GameObject {
     public void render(ShaderProgram shader) {
         forward.render(shader);
         back.render(shader);
+
         left.render(shader);
         right.render(shader);
+
         up.render(shader);
         down.render(shader);
     }

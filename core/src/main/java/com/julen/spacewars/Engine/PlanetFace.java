@@ -17,7 +17,29 @@ public class PlanetFace {
     public final Mesh wireframe;
 
     public PlanetFace(Direction direction) {
-        this.up.set(Direction.upVector);
+        switch (direction) {
+            case Forward:
+                this.up.set(Direction.downVector);
+                break;
+            case Back:
+                this.up.set(Direction.downVector);
+                break;
+
+            case Up:
+                this.up.set(Direction.forwardVector);
+                break;
+            case Down:
+                this.up.set(Direction.backVector);
+                break;
+
+            case Left:
+                this.up.set(Direction.downVector);
+                break;
+            case Right:
+                this.up.set(Direction.downVector);
+                break;
+        }
+
         this.direction.set(direction.vector());
         this.position.add(direction.vector()).scl(0.5f);
 
@@ -25,7 +47,7 @@ public class PlanetFace {
         b.hasColor = true;
         b.hasNormal = true;
 
-        b.rectangle2(0, 0, 0, direction.ccw(), direction.ccw(), direction.color(), 5);
+        b.rectangle2(0, 0, 0, -1, -1, direction.color(), 5);
 
         Mesh[] meshes = b.build(true);
         this.wireframe = meshes[0];
