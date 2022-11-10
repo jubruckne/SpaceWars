@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.julen.spacewars.Engine.SimplexNoise;
 
 public class Builder {
     private int stride;
@@ -18,6 +20,7 @@ public class Builder {
     private short[] lines;
     private int lin_pos;
     private int lins;
+    private int resolution = 1;
 
     public boolean hasColor = true;
     public boolean hasNormal = true;
@@ -228,6 +231,78 @@ public class Builder {
         this.rectangle2(0f, 0f, 0f, radius, radius, color, resolution);
     }
 
+    public void rectangle2(Vector3 axisA, Vector3 axisB, Vector3 localUp, Color color, int resolution) {
+        short v_bottom_left = 0;
+        short v_bottom_right = 0;
+        short v_top_right = 0;
+        short v_top_left = 0;
+        int offset = verts;
+
+        Vector2 percent = new Vector2();
+        Vector3 point = new Vector3();
+
+        for (int i = 0; i < (resolution + 1) * (resolution + 1); i++) {
+            int sx = i % (resolution + 1);
+            int sy = i / (resolution + 1);
+
+            percent.set((float) sx / (float) resolution, (float) sy / (float) resolution);
+
+            point.set(localUp);
+            point.add(axisA.cpy().scl(percent.x));
+            point.add(axisB.cpy().scl(percent.y));
+
+            vertex(point.x, point.y, point.z, color);
+        }
+
+        for (int i = 0; i < resolution * resolution; i++) {
+            int sx = i % resolution;
+            int sy = i / resolution;
+
+            v_bottom_left = (short) (offset + (sx + sy * (resolution + 1)));
+            v_bottom_right = (short) (v_bottom_left + 1);
+
+            v_top_left = (short) (offset + sx + (sy + 1) * (resolution + 1));
+            v_top_right = (short) (v_top_left + 1);
+
+            //bottom-left
+            triangles[tri_pos++] = v_bottom_left;
+            triangles[tri_pos++] = v_bottom_right;
+            triangles[tri_pos++] = v_top_left;
+            tris++;
+
+            //top-right 3-4-2
+            triangles[tri_pos++] = v_top_right;
+            triangles[tri_pos++] = v_top_left;
+            triangles[tri_pos++] = v_bottom_right;
+            tris++;
+
+            // lines
+            if (sy == 0) {
+                lines[lin_pos++] = v_bottom_left;
+                lines[lin_pos++] = v_bottom_right;
+                lins++;
+            }
+
+            lines[lin_pos++] = v_bottom_right;
+            lines[lin_pos++] = v_top_right;
+            lins++;
+
+            lines[lin_pos++] = v_top_right;
+            lines[lin_pos++] = v_top_left;
+            lins++;
+
+            if (sx == 0) {
+                lines[lin_pos++] = v_top_left;
+                lines[lin_pos++] = v_bottom_left;
+                lins++;
+            }
+
+            lines[lin_pos++] = v_top_left;
+            lines[lin_pos++] = v_bottom_right;
+            lins++;
+        }
+    }
+
     public void rectangle2(float x, float y, float z, float width, float height, Color color, int resolution) {
 /*
         4-------3
@@ -242,6 +317,8 @@ public class Builder {
 
         log("rectangle2(float %f, float %f, float %f, float %f, float %f, Color %s, int %i)",
                 x, y, z, width, height, color.toString(), resolution);
+
+        this.resolution = resolution;
 
         x -= width * .5f;
         y -= height * .5f;
@@ -615,6 +692,52 @@ public class Builder {
 
     public void spherify(float radius) {
         spherify(0f, 0f, 0f, radius);
+    }
+
+    private float torusnoise(float[][][][] noise, double nx, double ny) {
+        final float TAU = (float) (Math.PI * 2.0f);
+        double angle_x = TAU * nx;
+        double angle_y = TAU * ny;
+
+        float n = (float) (new SimplexNoise(15)).noise(
+                (Math.cos(angle_x) / TAU),
+                (Math.sin(angle_x) / TAU),
+                (Math.cos(angle_y) / TAU),
+                (Math.sin(angle_y) / TAU));
+
+        return n * 0.15f;
+
+/*
+        return noise
+                [(int) (Math.cos(angle_x) / TAU * 10f)]
+                [(int) (Math.sin(angle_x) / TAU * 10f)]
+                [(int) (Math.cos(angle_y) / TAU * 10f)]
+                [(int) (Math.sin(angle_y) / TAU * 10f)];
+                */
+    }
+
+    public void spherify(float centerX, float centerY, float centerZ, float radius, float[][][][] noise) {
+        Vector3 vert = new Vector3();
+
+        for (int i = 0; i < (resolution * resolution); i++) {
+            int sx = i % resolution;
+            int sy = i / resolution;
+
+            vert.set(
+                    vertices[i * stride] - centerX,
+                    vertices[i * stride + 1] - centerY,
+                    vertices[i * stride + 2] - centerZ).nor();
+
+            vert.setLength(radius);
+
+            float height = torusnoise(noise, vert.x, vert.y);
+
+            vert.setLength(radius + height);
+
+            vertices[i * stride] = vert.x + centerX;
+            vertices[i * stride + 1] = vert.y + centerY;
+            vertices[i * stride + 2] = vert.z + centerZ;
+        }
     }
 
     public void spherify(float centerX, float centerY, float centerZ, float radius) {

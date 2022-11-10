@@ -1,6 +1,7 @@
 package com.julen.spacewars.Engine;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 
 public enum Direction {
@@ -31,14 +32,29 @@ public enum Direction {
         return 1;
     }
 
+    public Texture texture() {
+        Texture texture = null;
+
+        if (this == Back) texture = new Texture("./cubemap/grid_posz.png");
+        if (this == Forward) texture = new Texture("./cubemap/grid_negz.png");
+
+        if (this == Right) texture = new Texture("./cubemap/grid_posx.png");
+        if (this == Left) texture = new Texture("./cubemap/grid_negx.png");
+
+        if (this == Up) texture = new Texture("./cubemap/grid_posy.png");
+        if (this == Down) texture = new Texture("./cubemap/grid_negy.png");
+
+        return texture;
+    }
+
     public Color color() {
-        if (this == Right) return Color.FOREST;
-        if (this == Left) return Color.LIME;
+        if (this == Up) return Color.LIME;
+        if (this == Down) return Color.FOREST;
 
-        if (this == Up) return Color.RED;
-        if (this == Down) return Color.CORAL;
+        if (this == Right) return Color.SCARLET;
+        if (this == Left) return Color.CORAL;
 
-        if (this == Back) return Color.BLUE;
+        if (this == Back) return Color.NAVY;
         if (this == Forward) return Color.ROYAL;
 
         return Color.WHITE;

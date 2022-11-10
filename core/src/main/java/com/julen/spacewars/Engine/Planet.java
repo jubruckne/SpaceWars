@@ -16,12 +16,14 @@ public class Planet extends GameObject {
 
         this.meshes = new Mesh[6];
 
-        this.forward = new PlanetFace(Direction.Forward);
-        this.back = new PlanetFace(Direction.Back);
-        this.left = new PlanetFace(Direction.Left);
-        this.right = new PlanetFace(Direction.Right);
         this.up = new PlanetFace(Direction.Up);
         this.down = new PlanetFace(Direction.Down);
+
+        this.left = new PlanetFace(Direction.Left);
+        this.right = new PlanetFace(Direction.Right);
+
+        this.forward = new PlanetFace(Direction.Forward);
+        this.back = new PlanetFace(Direction.Back);
 
         this.meshes[0] = forward.mesh;
         this.meshes[1] = back.mesh;

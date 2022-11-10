@@ -25,6 +25,7 @@ void main() {
         vTexcoord = vec3(a_position.xy, 0.0) + 0.5;
         vTexcoord = vec3(vNormal.x / 2.0 + 0.5, vNormal.y / 2.0, 1.0);
         vTexcoord = vec3(vTexcoord.y, -vTexcoord.x, 1.0);
+        vTexcoord = vec3(a_position.x + 0.5, -a_position.y + 0.5, 1.0);
     } else if (u_textureMode == 2.0) {
         vTexcoord = vNormal.xyz;
     } else if (u_textureMode == -1.0) {
