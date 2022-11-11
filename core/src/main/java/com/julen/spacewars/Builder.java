@@ -714,35 +714,28 @@ public class Builder {
                 */
     }
 
-    public void spherify(float centerX, float centerY, float centerZ, float radius, float[][][][] noise) {
+    public void spherify(float centerX, float centerY, float centerZ, float radius, float[][] noise) {
         Vector3 vert = new Vector3();
 
         for (int i = 0; i < ((resolution + 1) * (resolution + 1)); i++) {
-            int sx = i % resolution;
-            int sy = i / resolution;
+            // int sx = i % resolution;
+            // int sy = i / resolution;
 
             vert.set(
                     vertices[i * stride] - centerX,
                     vertices[i * stride + 1] - centerY,
                     vertices[i * stride + 2] - centerZ);
 
-            if (radius == .45f) {
-                vert.scl(2.0f);
-                float x2 = vert.x * vert.x;
-                float y2 = vert.y * vert.y;
-                float z2 = vert.z * vert.z;
+            vert.scl(2.0f);
+            float x2 = vert.x * vert.x;
+            float y2 = vert.y * vert.y;
+            float z2 = vert.z * vert.z;
 
-                vert.x = (float) (vert.x * Math.sqrt(1f - y2 * 0.5f - z2 * 0.5f + y2 * z2 / 3f));
-                vert.y = (float) (vert.y * Math.sqrt(1f - z2 * 0.5f - x2 * 0.5f + z2 * x2 / 3f));
-                vert.z = (float) (vert.z * Math.sqrt(1f - x2 * 0.5f - y2 * 0.5f + x2 * y2 / 3f));
-            } else if (radius == .44f) {
-                vert.setLength(radius);
-            } else {
-                float height = 0; // torusnoise(noise, vert.x * 2f, vert.y * 2f) * 0.75f;
-                //vert.setLength(radius + height);
+            vert.x = (float) (vert.x * Math.sqrt(1f - y2 * 0.5f - z2 * 0.5f + y2 * z2 / 3f));
+            vert.y = (float) (vert.y * Math.sqrt(1f - z2 * 0.5f - x2 * 0.5f + z2 * x2 / 3f));
+            vert.z = (float) (vert.z * Math.sqrt(1f - x2 * 0.5f - y2 * 0.5f + x2 * y2 / 3f));
 
-            }
-
+            vert.scl(radius);
 
             vertices[i * stride] = vert.x + centerX;
             vertices[i * stride + 1] = vert.y + centerY;

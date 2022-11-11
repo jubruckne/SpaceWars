@@ -5,47 +5,52 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.julen.spacewars.Builder;
 
 import static com.badlogic.gdx.graphics.GL20.*;
 
 public class PlanetFace {
-    public final Vector3 direction = new Vector3();
-
     public final Mesh mesh;
     public final Mesh wireframe;
 
     private Texture texture;
-    private static float[][][][] noise;
+    private static float[][] noise;
     public final float radius;
 
     private Matrix4 modelMatrix = new Matrix4().idt();
+    private final Planet planet;
 
-    public PlanetFace(Direction direction, float radius) {
-        this.direction.set(direction.vector);
+    public final int width;
+    public final int height;
+
+    public PlanetFace(Planet planet, Direction direction, float radius) {
+        this.planet = planet;
+
+        this.width = 100;
+        this.height = 100;
+
         if (noise == null) {
-            noise = new SimplexNoise(1).create4D(64, 15, -1, 1);
+            noise = new SimplexNoise(1).create2D(100, 15, -1, 1);
         }
 
         this.radius = radius;
-        this.texture = new Texture(direction.texture);
+        this.texture = new Texture(planet.heightmap.getPixmap(direction));
 
-        modelMatrix.setToTranslation(this.direction.cpy().scl(0.5f));
+        modelMatrix.setToTranslation(direction.vector.cpy().scl(0.5f));
 
-        if (this.direction.epsilonEquals(Direction.Right.vector)) {
+        if (direction == Direction.Right) {
             modelMatrix.rotate(Direction.Up.vector, 90f);
         }
-        if (this.direction.epsilonEquals(Direction.Left.vector)) {
+        if (direction == Direction.Left) {
             modelMatrix.rotate(Direction.Down.vector, 90f);
         }
-        if (this.direction.epsilonEquals(Direction.Up.vector)) {
+        if (direction == Direction.Up) {
             modelMatrix.rotate(Direction.Left.vector, 90f);
         }
-        if (this.direction.epsilonEquals(Direction.Down.vector)) {
+        if (direction == Direction.Down) {
             modelMatrix.rotate(Direction.Right.vector, 90f);
         }
-        if (this.direction.epsilonEquals(Direction.Back.vector)) {
+        if (direction == Direction.Back) {
             modelMatrix.rotate(Direction.Up.vector, 180f);
         }
 
@@ -54,14 +59,17 @@ public class PlanetFace {
         b.hasNormal = true;
         b.reset();
 
-        b.rectangle2(0, 0, 0f, 1, 1, direction.color, (int) (10f * radius + 5));
-
-        b.spherify(0, 0, -.50f, radius, noise);
+        b.rectangle2(0, 0, 0f, 1, 1, direction.color, 100);
+        b.spherify(0, 0, -0.50f, radius, noise);
 
         Mesh[] meshes = b.build(true);
 
         this.wireframe = meshes[0];
         this.mesh = meshes[1];
+    }
+
+    public PlanetFace up() {
+        return null;
     }
 
     public void render(ShaderProgram shader, Matrix4 planetMatrix) {
@@ -92,7 +100,7 @@ public class PlanetFace {
 
         final int GL_PROGRAM_POINT_SIZE = 0x8642;
         Gdx.gl.glEnable(GL_PROGRAM_POINT_SIZE);
-        wireframe.render(shader, GL_POINTS);
+        //wireframe.render(shader, GL_POINTS);
         Gdx.gl.glDisable(GL_PROGRAM_POINT_SIZE);
 
         //wireframe.render(shader, GL_LINES);

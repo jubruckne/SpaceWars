@@ -111,24 +111,24 @@ public class SimplexNoise {  // Simplex noise in 2D, 3D and 4D
         return g.x * x + g.y * y + g.z * z + g.w * w;
     }
 
-    public float[][] create2D(int size, final float wavelength, final float amplitude) {
-        return create2D(size, wavelength, -amplitude, amplitude);
+    public float[][] create2D(int width, int height, final float wavelength, final float amplitude) {
+        return create2D(width, height, wavelength, -amplitude, amplitude);
     }
 
-    public float[][] create2D(int size, final float wavelength, final float min, final float max) {
-        float[][] map = new float[size][size];
+    public float[][] create2D(int width, int height, final float wavelength, final float min, final float max) {
+        float[][] map = new float[width][height];
 
         float fx, fy;
         float range = max - min;
         float frequency = 1f / wavelength;
 
-        for (int x = 0; x < size; x++) {
+        for (int x = 0; x < width; x++) {
             fx = x * frequency;
 
-            for (int y = 0; y < size; y++) {
+            for (int y = 0; y < height; y++) {
                 fy = y * frequency;
 
-                map[y][x] = (float) ((noise(1f + fx, 1f + fy) + 1f) * 0.5f * range) + min;
+                map[x][y] = (float) ((noise(1f + fx, 1f + fy) + 1f) * 0.5f * range) + min;
             }
         }
 

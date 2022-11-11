@@ -13,20 +13,24 @@ public class Planet extends GameObject {
 
     public final float radius;
 
+    public final Heightmap heightmap;
+
     public Planet(String id, float radius) {
         super(id);
+
+        this.heightmap = new Heightmap(100, 100);
 
         this.radius = radius;
         this.meshes = new Mesh[6];
 
-        this.up = new PlanetFace(Direction.Up, radius);
-        this.down = new PlanetFace(Direction.Down, radius);
+        this.up = new PlanetFace(this, Direction.Up, radius);
+        this.down = new PlanetFace(this, Direction.Down, radius);
 
-        this.left = new PlanetFace(Direction.Left, radius);
-        this.right = new PlanetFace(Direction.Right, radius);
+        this.left = new PlanetFace(this, Direction.Left, radius);
+        this.right = new PlanetFace(this, Direction.Right, radius);
 
-        this.forward = new PlanetFace(Direction.Forward, radius);
-        this.back = new PlanetFace(Direction.Back, radius);
+        this.forward = new PlanetFace(this, Direction.Forward, radius);
+        this.back = new PlanetFace(this, Direction.Back, radius);
 
         this.meshes[0] = forward.mesh;
         this.meshes[1] = back.mesh;

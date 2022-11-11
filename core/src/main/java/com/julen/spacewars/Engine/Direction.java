@@ -16,6 +16,8 @@ public enum Direction {
     public final Vector3 vector;
     public String texture;
 
+    public static Direction[] sides = new Direction[]{Left, Forward, Right, Back};
+
     Direction(int idx, Color color, Vector3 vector3) {
         this.index = idx;
         this.color = color;
