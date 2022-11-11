@@ -20,11 +20,20 @@ public class World {
     Texture texture;
 
     Planet planet;
+    Planet planet2;
+    Planet planet3;
 
     private final ShaderProgram shader;
 
     public World() {
-        planet = new Planet("planet");
+        planet = new Planet("planet", 1f);
+
+        planet2 = new Planet("Planet2", 0.44f);
+        planet2.setPosition(1.05f, 1.25f, 1.85f);
+
+        planet3 = new Planet("Planet3", 0.45f);
+        planet3.setPosition(-1.25f, 1, -1.25f);
+
 
         ShaderProgram.pedantic = true;
         shader = new ShaderProgram(
@@ -205,6 +214,8 @@ public class World {
         //skybox.render(shader, GL_TRIANGLES);
 
         planet.render(shader);
+        planet2.render(shader);
+        planet3.render(shader);
 
         for (GameObject gameObject : gameObjects) {
             gameObject.render(shader);

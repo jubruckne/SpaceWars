@@ -11,19 +11,22 @@ public class Planet extends GameObject {
     public final PlanetFace up;
     public final PlanetFace down;
 
-    public Planet(String id) {
+    public final float radius;
+
+    public Planet(String id, float radius) {
         super(id);
 
+        this.radius = radius;
         this.meshes = new Mesh[6];
 
-        this.up = new PlanetFace(Direction.Up);
-        this.down = new PlanetFace(Direction.Down);
+        this.up = new PlanetFace(Direction.Up, radius);
+        this.down = new PlanetFace(Direction.Down, radius);
 
-        this.left = new PlanetFace(Direction.Left);
-        this.right = new PlanetFace(Direction.Right);
+        this.left = new PlanetFace(Direction.Left, radius);
+        this.right = new PlanetFace(Direction.Right, radius);
 
-        this.forward = new PlanetFace(Direction.Forward);
-        this.back = new PlanetFace(Direction.Back);
+        this.forward = new PlanetFace(Direction.Forward, radius);
+        this.back = new PlanetFace(Direction.Back, radius);
 
         this.meshes[0] = forward.mesh;
         this.meshes[1] = back.mesh;
@@ -35,13 +38,13 @@ public class Planet extends GameObject {
 
     @Override
     public void render(ShaderProgram shader) {
-        forward.render(shader);
-        back.render(shader);
+        forward.render(shader, modelMatrix);
+        back.render(shader, modelMatrix);
 
-        left.render(shader);
-        right.render(shader);
+        left.render(shader, modelMatrix);
+        right.render(shader, modelMatrix);
 
-        up.render(shader);
-        down.render(shader);
+        up.render(shader, modelMatrix);
+        down.render(shader, modelMatrix);
     }
 }

@@ -14,10 +14,9 @@ import static com.badlogic.gdx.graphics.GL20.*;
 public class GameObject {
     private String id;
     private Color color;
-    private final Vector3 position = new Vector3(0f, 0f, 0f);
-    private final Quaternion rotation = new Quaternion(0f, 0f, 0f, 1f);
-    private float scale = 1f;
-    private final Matrix4 modelMatrix = new Matrix4(position, rotation, new Vector3(scale, scale, scale));
+    protected final Vector3 position = new Vector3(0f, 0f, 0f);
+    protected final Quaternion rotation = new Quaternion().idt();
+    protected final Matrix4 modelMatrix = new Matrix4().idt();
     protected Mesh[] meshes;
     private Texture texture;
 
@@ -64,12 +63,12 @@ public class GameObject {
 
     public void setPosition(float x, float y, float z) {
         this.position.set(new Vector3(x, y, z));
-        this.modelMatrix.set(this.position, this.rotation, new Vector3(scale, scale, scale));
+        this.modelMatrix.setTranslation(x, y, z);
     }
 
     public void setPosition(Vector3 pos) {
         this.position.set(pos);
-        this.modelMatrix.set(pos, this.rotation, new Vector3(scale, scale, scale));
+        this.modelMatrix.setTranslation(pos);
     }
 
     public void setRotation(float axisX, float axisY, float axisZ, float angle) {
@@ -86,11 +85,7 @@ public class GameObject {
     }
 
     public void setRotation(Direction direction) {
-        setRotation(Direction.Forward.vector(), 0.0f);
-    }
-
-    public void setScale(float v) {
-        this.scale = v;
+        setRotation(Direction.Forward.vector, 0.0f);
     }
 
     public void render(ShaderProgram shader) {
@@ -111,7 +106,7 @@ public class GameObject {
         }
 
         Matrix4 modelMatrix = new Matrix4().set(
-                position, rotation, new Vector3(scale, scale, scale)
+                position, rotation
         );
 
         shader.setUniformi("u_texture", 7);
