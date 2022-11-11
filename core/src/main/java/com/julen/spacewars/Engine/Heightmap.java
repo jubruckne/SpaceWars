@@ -9,14 +9,18 @@ public class Heightmap {
     public final int width;
     public final int height;
 
-    public Heightmap(int width, int height) {
-        float f1 = 0, f2 = 0, f3 = 0;
+    public Heightmap(int width, int height, int seed) {
+        float f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 
         float min = 0;
         float max = 1;
-        float wavelength = 35f;
+        float wavelength = 55f;
         float range = max - min;
         float frequency = 1f / wavelength;
+
+        float ka = seed + frequency;
+        float kb = ka * width - frequency;
+        float kc = kb * (height + width) + frequency;
 
         int offsetX = 0;
 
@@ -25,36 +29,20 @@ public class Heightmap {
         this.width = width;
         this.height = height;
 
-        SimplexNoise n = new SimplexNoise(11);
-
-        /*
-        A circle can be defined as the locus of all points that satisfy the equations
-x = r cos(t)    y = r sin(t)
-where x,y are the coordinates of any point on the circle, r is the radius of the circle and
-*/
+        SimplexNoise n = new SimplexNoise(seed);
 
         for (Direction d : Direction.sides) {
             for (int x = 0; x < width; x++) {
+                float fNX = (float) (x + offsetX) / (float) (width * 4f);
+                float fRdx = (float) (fNX * 2f * Math.PI);
+                f1 = (float) (height * .55f * Math.sin(fRdx));
+                f2 = (float) (height * .55f * Math.cos(fRdx));
 
                 for (int y = 0; y < height; y++) {
-                    if (d == Direction.Left) {
-                        f1 = x;
-                        f2 = x;
-                    } else if (d == Direction.Forward) {
-                        f1 = width + x;
-                        f2 = width;
-                    } else if (d == Direction.Right) {
-                        f1 = width * 2 - x;
-                        f2 = width;
-                    } else if (d == Direction.Back) {
-                        f1 = width - x;
-                        f2 = width - x;
-                    }
-
                     f3 = y;
 
                     maps[d.index][x][y] = (float)
-                            ((n.noise(f1 * frequency, f2 * frequency, f3 * frequency) + 1f) * 0.5f * range) + min;
+                            ((n.noise(ka + f1 * frequency, kb + f2 * frequency, kc + f3 * frequency) + 1f) * 0.5f * range) + min;
                 }
             }
 

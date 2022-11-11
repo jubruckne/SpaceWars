@@ -18,7 +18,7 @@ public class Planet extends GameObject {
     public Planet(String id, float radius) {
         super(id);
 
-        this.heightmap = new Heightmap(100, 100);
+        this.heightmap = new Heightmap(100, 100, 5);
 
         this.radius = radius;
         this.meshes = new Mesh[6];
