@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.julen.spacewars.Builder;
 
 import static com.badlogic.gdx.graphics.GL20.*;
@@ -12,9 +13,9 @@ import static com.badlogic.gdx.graphics.GL20.*;
 public class PlanetFace {
     public final Mesh mesh;
     public final Mesh wireframe;
+    public final Vector3 axis = new Vector3();
 
     private Texture texture;
-    private static float[][] noise;
     public final float radius;
 
     private Matrix4 modelMatrix = new Matrix4().idt();
@@ -29,12 +30,9 @@ public class PlanetFace {
         this.width = 100;
         this.height = 100;
 
-        if (noise == null) {
-            noise = new SimplexNoise(1).create2D(100, 15, -1, 1);
-        }
-
         this.radius = radius;
         this.texture = new Texture(planet.heightmap.getPixmap(direction));
+        this.axis.set(direction.vector);
 
         modelMatrix.setToTranslation(direction.vector.cpy().scl(0.5f));
 
@@ -60,7 +58,7 @@ public class PlanetFace {
         b.reset();
 
         b.rectangle2(0, 0, 0f, 1, 1, direction.color, 100);
-        b.spherify(0, 0, -0.50f, radius, noise);
+        // b.spherify(0, 0, -0.50f, radius, null);
 
         Mesh[] meshes = b.build(true);
 

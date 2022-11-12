@@ -12,13 +12,16 @@ public class Planet extends GameObject {
     public final PlanetFace down;
 
     public final float radius;
+    protected final int seed;
 
     public final Heightmap heightmap;
 
     public Planet(String id, float radius) {
         super(id);
 
-        this.heightmap = new Heightmap(100, 100, 5);
+        seed = Math.abs(id.hashCode() % 596741);
+
+        this.heightmap = new Heightmap(100, 100, seed, 5);
 
         this.radius = radius;
         this.meshes = new Mesh[6];
@@ -40,8 +43,14 @@ public class Planet extends GameObject {
         this.meshes[5] = down.mesh;
     }
 
+    public void update() {
+        // this.modelMatrix.rotate(up.axis, -.2f);
+    }
+
     @Override
     public void render(ShaderProgram shader) {
+        update();
+
         forward.render(shader, modelMatrix);
         back.render(shader, modelMatrix);
 

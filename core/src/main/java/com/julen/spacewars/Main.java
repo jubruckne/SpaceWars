@@ -63,9 +63,8 @@ public class Main extends ApplicationAdapter implements PlayerController.IEvents
 
 
         camera = new PerspectiveCamera(45, 800, 600);
-        camera.position.set(1.5f, 2.0f, 22.5f);
-        camera.position.set(1.0f, 1.5f, 5f);
-        camera.direction.set(-0.25f, -0.25f, -1f).nor();
+        camera.position.set(0.22f, 3f, 3f);
+        camera.direction.set(-0.10f, -0.8f, -1f).nor();
         //camera.rotate(map.right, 45);
         camera.near = 0.1f;
         camera.far = 100f;

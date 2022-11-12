@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.julen.spacewars.Engine.SimplexNoise;
 
 public class Builder {
     private int stride;
@@ -690,28 +689,6 @@ public class Builder {
 
     public void spherify(float radius) {
         spherify(0f, 0f, 0f, radius);
-    }
-
-    private float torusnoise(float[][][][] noise, double nx, double ny) {
-        final float TAU = (float) (Math.PI * 2.0f);
-        double angle_x = TAU * nx;
-        double angle_y = TAU * ny;
-
-        float n = (float) (new SimplexNoise(15)).noise(
-                (Math.cos(angle_x) / TAU),
-                (Math.sin(angle_x) / TAU),
-                (Math.cos(angle_y) / TAU),
-                (Math.sin(angle_y) / TAU));
-
-        return n * 0.15f;
-
-/*
-        return noise
-                [(int) (Math.cos(angle_x) / TAU * 10f)]
-                [(int) (Math.sin(angle_x) / TAU * 10f)]
-                [(int) (Math.cos(angle_y) / TAU * 10f)]
-                [(int) (Math.sin(angle_y) / TAU * 10f)];
-                */
     }
 
     public void spherify(float centerX, float centerY, float centerZ, float radius, float[][] noise) {

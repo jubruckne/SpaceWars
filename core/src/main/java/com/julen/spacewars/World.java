@@ -29,10 +29,10 @@ public class World {
         planet = new Planet("planet", 1f);
 
         planet2 = new Planet("Planet2", 0.45f);
-        planet2.setPosition(.5f, 1, 1.25f);
+        planet2.setPosition(.75f, 1.5f, -1.25f);
 
         planet3 = new Planet("Planet3", 0.45f);
-        planet3.setPosition(-.5f, 1, 1.25f);
+        planet3.setPosition(-.5f, 1, -1.25f);
 
 
         ShaderProgram.pedantic = true;

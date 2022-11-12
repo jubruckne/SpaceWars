@@ -31,19 +31,19 @@ public class Lwjgl3Launcher {
         configuration.setWindowPosition(10, 40);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         configuration.setBackBufferConfig(8, 8, 8, 8, 16, 0, 8);
-        Graphics.DisplayMode displayMode = Lwjgl3ApplicationConfiguration.getDisplayMode();
-        //configuration.setMaximized(true);
-        // configuration.setOpenGLEmulation(GL30, 3, 2);
 
-		/*
-		Graphics.Monitor monitor = Lwjgl3ApplicationConfiguration.getMonitors()[0];
-		Graphics.DisplayMode displayMode = Lwjgl3ApplicationConfiguration.getDisplayModes(monitor)[1];
+        Graphics.Monitor[] monitors = Lwjgl3ApplicationConfiguration.getMonitors();
+        Graphics.Monitor monitor = monitors[0];
+        Graphics.DisplayMode displayMode = Lwjgl3ApplicationConfiguration.getDisplayModes(monitor)[1];
 
-		configuration.setMaximizedMonitor(monitor);
+        if (monitors.length > 1) {
+            // show app on 2nd monitor
+            monitor = monitors[1];
+            configuration.setMaximizedMonitor(monitor);
+            displayMode = Lwjgl3ApplicationConfiguration.getDisplayModes(monitor)[1];
+            configuration.setFullscreenMode(displayMode);
+        }
 
-		configuration.setFullscreenMode(displayMode);
-		configuration.setMaximized(true);
-		*/
         configuration.setForegroundFPS(displayMode.refreshRate);
 
         return configuration;
