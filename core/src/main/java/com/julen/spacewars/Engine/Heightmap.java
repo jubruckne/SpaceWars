@@ -1,7 +1,7 @@
 package com.julen.spacewars.Engine;
 
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.math.Vector3;
 import com.julen.spacewars.Utils;
 
 import java.nio.ByteBuffer;
@@ -21,16 +21,49 @@ public class Heightmap {
         this.maps = new float[6][width][height];
     }
 
-    private void build(Direction d, Mesh mesh) {
-        //mesh.getVertices();
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                //n.noise(ka + f1 * o_freq, kb + f2 * o_freq, kc + f3 * o_freq);
+    private void build() {
+        float min = 0;
+        float max = 1;
+        float wavelength = 1f;
+        float range = max - min;
+        float frequency = 1f / wavelength;
+        float noise = 0f;
+
+        SimplexNoise n = new SimplexNoise(seed);
+
+        for (Direction d : Direction.sides) {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    float uc = (2f * (x + 0.5f) / (float) this.width) - 1f;
+                    float vc = (2f * (y + 0.5f) / (float) this.height) - 1f;
+
+                    Vector3 point = Direction.Forward.toSphere(uc, vc, 1f);
+
+
+                    noise = 0;
+                    float o_freq = frequency;
+                    float o_strengh = 1;
+                    float o_div = 0;
+
+                    for (int o = 0; o < octaves; o++) {
+                        noise += o_strengh * n.noise(point.x * o_freq, point.y * o_freq, point.z * o_freq);
+
+                        o_freq *= 2f;
+                        o_div += o_strengh;
+                        o_strengh *= 0.5;
+                    }
+
+                    noise /= o_div;
+
+                    noise = (noise + 1f) * 0.5f * range + min;
+
+                    maps[d.index][x][y] = noise;
+                }
             }
         }
     }
 
-    private void build_x() {
+    private void build2() {
         float f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 
         float min = 0;
@@ -59,7 +92,7 @@ public class Heightmap {
                 f2 = (float) (height * Math.cos(fRdx));
                 fade = 0f;
 
-                for (int y = 0; y < height * 2; y++) {
+                for (int y = 0; y < height; y++) {
                     f3 = y;
 
                     noise = 0;
@@ -82,8 +115,6 @@ public class Heightmap {
                     noise /= o_div;
 
                     noise = (noise + 1f) * 0.5f * range + min;
-                    Utils.log("y=%i", y);
-
 
                     maps[d.index][x][y] = noise;
                 }
@@ -109,8 +140,8 @@ public class Heightmap {
     */
     }
 
-    public Pixmap getPixmap(Direction d, Mesh mesh) {
-        build(d, mesh);
+    public Pixmap getPixmap(Direction d) {
+        build();
 
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         ByteBuffer pixels = pixmap.getPixels();

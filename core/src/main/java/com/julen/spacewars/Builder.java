@@ -704,6 +704,9 @@ public class Builder {
                     vertices[i * stride + 2] - centerZ);
 
             vert.scl(2.0f);
+
+            vert.nor();
+            /*
             float x2 = vert.x * vert.x;
             float y2 = vert.y * vert.y;
             float z2 = vert.z * vert.z;
@@ -711,8 +714,8 @@ public class Builder {
             vert.x = (float) (vert.x * Math.sqrt(1f - y2 * 0.5f - z2 * 0.5f + y2 * z2 / 3f));
             vert.y = (float) (vert.y * Math.sqrt(1f - z2 * 0.5f - x2 * 0.5f + z2 * x2 / 3f));
             vert.z = (float) (vert.z * Math.sqrt(1f - x2 * 0.5f - y2 * 0.5f + x2 * y2 / 3f));
-
-            vert.scl(radius);
+*/
+            //vert.scl(radius);
 
             vertices[i * stride] = vert.x + centerX;
             vertices[i * stride + 1] = vert.y + centerY;

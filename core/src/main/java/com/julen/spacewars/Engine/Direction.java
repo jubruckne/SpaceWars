@@ -16,7 +16,7 @@ public enum Direction {
     public final Vector3 vector;
     public String texture;
 
-    public static Direction[] sides = new Direction[]{Left, Forward, Right, Back};
+    public static Direction[] sides = new Direction[]{Left, Forward, Right, Back, Down, Up};
 
     Direction(int idx, Color color, Vector3 vector3) {
         this.index = idx;
@@ -26,32 +26,36 @@ public enum Direction {
         texture = this.name() + ".png";
     }
 
-    public Vector3 toUnitSphere(float u, float v) {
+    public Vector3 toSphere(float u, float v) {
+        return this.toSphere(u, v, 1f);
+    }
+
+    public Vector3 toSphere(float u, float v, float radius) {
         Vector3 point = new Vector3();
 
         switch (this) {
             case Right:
-                point.set(1.0f, v, -u);    // POSITIVE X
+                point.set(radius, v, -u);    // POSITIVE X
                 break;
 
             case Left:
-                point.set(1.0f, v, u);      // NEGATIVE X
+                point.set(radius, v, u);      // NEGATIVE X
                 break;
 
             case Up:
-                point.set(u, 1.0f, -v);        // POSITIVE Y
+                point.set(u, radius, -v);        // POSITIVE Y
                 break;
 
             case Down:
-                point.set(u, -1.0f, v);      // NEGATIVE Y
+                point.set(u, -radius, v);      // NEGATIVE Y
                 break;
 
             case Forward:
-                point.set(u, v, 1.0f);   // POSITIVE Z
+                point.set(u, v, radius);   // POSITIVE Z
                 break;
 
             case Back:
-                point.set(-u, v, -1.0f);     // NEGATIVE Z
+                point.set(-u, v, -radius);     // NEGATIVE Z
                 break;
         }
 

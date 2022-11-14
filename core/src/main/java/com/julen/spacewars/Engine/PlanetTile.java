@@ -19,14 +19,12 @@ public class PlanetTile {
         float uc = (2f * (this.u + 0.5f) / (float) this.face.width) - 1f;
         float vc = (2f * (this.v + 0.5f) / (float) this.face.height) - 1f;
 
-        this.model_pos = face.direction.toUnitSphere(uc, vc);
-
-        Utils.log("%s", this.toString());
+        this.model_pos = face.direction.toSphere(uc, vc, this.planet.radius);
     }
 
     @Override
     public String toString() {
-        return Utils.format("%i.%i.%i: %.1f", face.direction.index, u, v, local_pos);
+        return Utils.format("%i.%i.%i: %.1f", face.direction.index, u, v, model_pos);
     }
 
 }

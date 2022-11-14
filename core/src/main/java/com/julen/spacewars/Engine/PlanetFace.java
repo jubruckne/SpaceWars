@@ -67,7 +67,7 @@ public class PlanetFace {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 this.tiles[x][y] = new PlanetTile(this, x, y);
-                this.tiles[x][y].model_pos.
+                //this.tiles[x][y].model_pos.
             }
         }
 
@@ -76,7 +76,7 @@ public class PlanetFace {
 
         this.wireframe = meshes[0];
         this.mesh = meshes[1];
-        //this.texture = new Texture(planet.heightmap.getPixmap(direction, b.getNormal()));
+        this.texture = new Texture(planet.heightmap.getPixmap(direction));
     }
 
     public PlanetFace up() {
