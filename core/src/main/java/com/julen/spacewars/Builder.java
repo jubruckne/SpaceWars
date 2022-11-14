@@ -731,18 +731,26 @@ public class Builder {
         }
     }
 
+    public float[] getVertices() {
+        return this.vertices;
+    }
+
+    public Vector3 getVertex(int vertexIndex) {
+        int offset = vertexIndex * stride;
+        return new Vector3(vertices[offset], vertices[offset + 1], vertices[offset + 2]);
+    }
+
+    public Vector3 getNormal(int vertexIndex) {
+        if (!hasNormal)
+            return null;
+
+        int offset = vertexIndex * stride + 3;
+        return new Vector3(vertices[offset], vertices[offset + 1], vertices[offset + 2]);
+    }
+
     public void log(String message, Object... args) {
         if (logging) {
             Utils.log(message, args);
         }
-    }
-
-    public void cube2(float radius, Color color, int resolution) {
-        // back
-        rectangle2(0, 0, radius * .5f, radius, radius, color, resolution);
-        //front
-        rectangle2(0, 0, -radius * .5f, -radius, -radius, color, resolution);
-        //up
-        rectangle2(0, radius, radius * .5f, radius, radius, Color.SALMON, resolution);
     }
 }

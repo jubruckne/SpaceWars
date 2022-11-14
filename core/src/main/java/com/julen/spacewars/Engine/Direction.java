@@ -26,6 +26,38 @@ public enum Direction {
         texture = this.name() + ".png";
     }
 
+    public Vector3 toUnitSphere(float u, float v) {
+        Vector3 point = new Vector3();
+
+        switch (this) {
+            case Right:
+                point.set(1.0f, v, -u);    // POSITIVE X
+                break;
+
+            case Left:
+                point.set(1.0f, v, u);      // NEGATIVE X
+                break;
+
+            case Up:
+                point.set(u, 1.0f, -v);        // POSITIVE Y
+                break;
+
+            case Down:
+                point.set(u, -1.0f, v);      // NEGATIVE Y
+                break;
+
+            case Forward:
+                point.set(u, v, 1.0f);   // POSITIVE Z
+                break;
+
+            case Back:
+                point.set(-u, v, -1.0f);     // NEGATIVE Z
+                break;
+        }
+
+        return point.nor();
+    }
+
     @Override
     public String toString() {
         return "Direction{" +

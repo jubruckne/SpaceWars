@@ -1,5 +1,6 @@
 package com.julen.spacewars.Engine;
 
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.julen.spacewars.Utils;
 
@@ -10,8 +11,26 @@ public class Heightmap {
     public final int width;
     public final int height;
     public final int octaves;
+    public final int seed;
 
     public Heightmap(int width, int height, int seed, int octaves) {
+        this.width = width;
+        this.height = height;
+        this.seed = seed;
+        this.octaves = octaves;
+        this.maps = new float[6][width][height];
+    }
+
+    private void build(Direction d, Mesh mesh) {
+        //mesh.getVertices();
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                //n.noise(ka + f1 * o_freq, kb + f2 * o_freq, kc + f3 * o_freq);
+            }
+        }
+    }
+
+    private void build_x() {
         float f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 
         float min = 0;
@@ -26,12 +45,6 @@ public class Heightmap {
         float kb = ka + seed % 17;
 
         int offsetX = 0;
-
-        this.octaves = octaves;
-        this.maps = new float[6][width][height * 2];
-
-        this.width = width;
-        this.height = height;
 
         float fade = 1;
 
@@ -73,8 +86,6 @@ public class Heightmap {
 
 
                     maps[d.index][x][y] = noise;
-
-
                 }
             }
 
@@ -98,14 +109,16 @@ public class Heightmap {
     */
     }
 
-    public Pixmap getPixmap(Direction d) {
+    public Pixmap getPixmap(Direction d, Mesh mesh) {
+        build(d, mesh);
+
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         ByteBuffer pixels = pixmap.getPixels();
         int idx1 = 0;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                byte value = (byte) (maps[d.index][x][y + height / 2] * 255f);
+                byte value = (byte) (maps[d.index][x][y] * 255f);
                 /*
                 if (value < 10 && value >= 0) {
                     pixels.put(idx1, new byte[]{35, 35, (byte) 100, (byte) 255});
@@ -119,4 +132,5 @@ public class Heightmap {
 
         return pixmap;
     }
+
 }
